@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "isekai-live"
+version = "0.1.0"
+description = "CLI tools for building Live Photo-compatible asset pairs."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+  "makelive>=0.6.2",
+]
+license = { text = "MIT" }
+authors = [
+  { name = "Levi" }
+]
+keywords = ["live-photo", "iphone", "metadata", "cli"]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.14",
+  "Environment :: Console"
+]
+
+[project.scripts]
+isekai-live = "isekai_live.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
