@@ -162,6 +162,65 @@ open output/livephoto.pvt
 
 ---
 
+## 🔄 提取和 Remix
+
+有了 `extract` 和 `remix`，你可以对现有的 Live Photo 进行素材提取和重新混音。
+
+### 📤 提取素材
+
+从已有的 Live Photo 中分离出封面图和视频：
+
+```bash
+isekai-live extract --input livephoto.jpg --output-dir extracted/
+```
+
+**输出：**
+```text
+extracted/
+├── cover.jpg   # 提取的封面图
+└── video.mov   # 提取的视频
+```
+
+### 🎛️ Remix 重新混音
+
+替换封面或视频，生成新的 Live Photo：
+
+```bash
+# 只替换封面
+isekai-live remix --input livephoto.jpg --new-cover ai_cover.jpg --output-dir remixed/
+
+# 只替换视频
+isekai-live remix --input livephoto.jpg --new-video new_clip.mov --output-dir remixed/
+
+# 封面和视频都替换
+isekai-live remix --input livephoto.jpg --new-cover new.jpg --new-video new.mov --output-dir remixed/
+
+# 保持原有资源 ID（适合覆盖更新）
+isekai-live remix --input livephoto.jpg --new-cover new.jpg --keep-asset-id --output-dir remixed/
+```
+
+### 💡 使用场景
+
+| 工作流 | 说明 |
+|--------|------|
+| 🎨 AI 封面 + 原视频 → 新 Live Photo | 用 AI 生成新封面，保留原视频 |
+| 🎬 原封面 + 新视频 → 新 Live Photo | 保留封面，替换动态内容 |
+| 🔄 提取现有 Live Photo 素材 → 重新混音 | 先 extract 分离，再 remix 重组 |
+
+**示例：AI 变身照迭代**
+```bash
+# 1. 提取原始素材
+isekai-live extract --input original.jpg --output-dir assets/
+
+# 2. 用 AI 生成新封面（外部工具）
+# ai-tool generate --prompt "anime style" --input assets/cover.jpg --output ai_cover.jpg
+
+# 3. 用新封面 remix
+isekai-live remix --input original.jpg --new-cover ai_cover.jpg --output-dir final/
+```
+
+---
+
 ## 📋 命令说明
 
 ### 基本格式
