@@ -4,6 +4,14 @@
 
 Build a Live Photo from a chosen still image and a chosen video, then export assets that Photos can actually import.
 
+![Qwen Live Demo](./docs/media/qwen-live-demo.gif)
+
+Demo assets used above:
+
+- cover: `tmp/qwen-test/test.jpeg`
+- stylized video: `tmp/qwen-test/stylized.mp4`
+- packaged Live Photo: `tmp/qwen-demo-live-original/livephoto.pvt`
+
 At a glance, the workflow looks like this:
 
 - pick the cover you want people to see first
@@ -131,6 +139,24 @@ isekai-live ai-video \
   --provider qwen \
   --qwen-key YOUR_DASHSCOPE_API_KEY \
   --output stylized.mp4
+```
+
+Complete AI workflow: original cover + stylized video -> Live Photo:
+
+```bash
+isekai-live ai-video \
+  --input-video test.mov \
+  --style anime \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output stylized.mp4
+
+isekai-live build \
+  --cover test.jpeg \
+  --video stylized.mp4 \
+  --output-dir output
+
+open output/livephoto.pvt
 ```
 
 ## What A Live Photo Really Is

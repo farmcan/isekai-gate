@@ -4,6 +4,14 @@
 
 从一张指定静态图和一段指定视频出发，构建 Live Photo，并导出成 Photos 真正能导入的资产。
 
+![Qwen Live Demo](./docs/media/qwen-live-demo.gif)
+
+上面这张演示图对应的真实产物是：
+
+- 封面图：`tmp/qwen-test/test.jpeg`
+- 风格化视频：`tmp/qwen-test/stylized.mp4`
+- 最终 Live Photo 包：`tmp/qwen-demo-live-original/livephoto.pvt`
+
 如果只看表面，这个工具做的事情很简单：
 
 - 选一张你想让别人先看到的封面图
@@ -131,6 +139,24 @@ isekai-live ai-video \
   --provider qwen \
   --qwen-key YOUR_DASHSCOPE_API_KEY \
   --output stylized.mp4
+```
+
+完整 AI 工作流：原图封面 + 风格化视频 -> Live Photo：
+
+```bash
+isekai-live ai-video \
+  --input-video test.mov \
+  --style anime \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output stylized.mp4
+
+isekai-live build \
+  --cover test.jpeg \
+  --video stylized.mp4 \
+  --output-dir output
+
+open output/livephoto.pvt
 ```
 
 ## Live Photo 其实是什么
