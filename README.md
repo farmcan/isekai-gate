@@ -1,280 +1,360 @@
-# isekai-live
+# 🎭 isekai-live
 
-中文在前，English below.
+> **让一张静态封面，藏住另一段会动的真相。**
+>
+> 用你指定的图片做封面，用你指定的视频做动态内容，一条命令生成 **iPhone 可识别的 Live Photo 资产对**。
 
-`isekai-live` is a Python CLI for building a Live Photo-style asset pair where the cover image and the motion video intentionally present different identities, such as "anime cover, real-person playback".
+<p align="center">
+  AI 图在外，真人视频在内。<br />
+  预览像海报，长按才揭晓。
+</p>
 
-## 中文
+<p align="center">
+  <a href="#-60-秒上手">🚀 快速开始</a> ·
+  <a href="#你可以拿它做什么">🎨 创意灵感</a> ·
+  <a href="#它和常见做法有什么不同">📊 对比</a> ·
+  <a href="#常见问题">❓ FAQ</a>
+</p>
 
-### 项目目标
+---
 
-这个项目用来生成一组可被 Apple Photos 识别的 Live Photo 资源：
+## 为什么这个项目会让人想立刻试一下？
 
-- 一张静态封面图
-- 一段动态视频
-- 一份可导入 Photos 的 `.pvt` 包
+大多数 Live Photo 工具解决的是「怎么做出一张会动的照片」。
 
-它适合做这种效果：
+**isekai-live** 解决的是另一件更有传播感的事：
 
-- 相册封面是 AI 动漫图
-- 点开或导入后，动态内容是真人视频
+| 你看到的 | 实际播放的 | 传播效果 |
+|----------|------------|----------|
+| 📸 一张静态封面图 | ▶️ 长按后播放视频 | "封面骗人！" |
+| 🎨 AI 生成的动漫形象 | 🎬 真人自拍视频 | "我变成二次元了！" |
+| 🖼️ 精致的海报感照片 | 😂 搞怪日常片段 | "反差萌！" |
 
-### 当前实现
+这意味着你可以把：
 
-当前版本提供一个本地 Python CLI：
+- **AI 生成图** + **真人自拍视频** → 朋友圈点赞收割机
+- **插画封面** + **现场片段** → 小红书爆款素材
+- **修复老照片** + **家庭祝福视频** → 长辈看了都感动
+- **拟人宠物图** + **宠物日常片段** → 毛孩子"成精"了
 
-- 输入一张封面图
-- 输入一段视频
-- 复制到输出目录
-- 为图片和视频写入相同的 Live Photo Content Identifier
-- 生成 `.pvt` 包，方便在 macOS Photos 中导入验证
+**一句话说完：**
 
-输出内容：
+> **它不是修图工具，也不是视频剪辑器。它是一个把"反差感"打包进 Live Photo 的命令行工具。**
 
-- `livephoto.jpg` 或 `livephoto.heic`
-- `livephoto.mov` 或 `livephoto.mp4`
-- `livephoto.pvt`
+---
 
-### 为什么不走 ffmpeg + exiftool
+## 你可以拿它做什么？
 
-这个项目一开始验证过 `ffmpeg + exiftool` 路线，但没有作为第一版方案保留，原因是：
+### 🎭 1. AI 变身照
 
-- `exiftool` 对 Live Photo 相关 Apple 元数据并不总是能稳定写入
-- `ffmpeg` 更适合媒体转码，不适合充当 Apple Live Photo 元数据的唯一构建器
-- 实际运行时，这条链路已经出现了标签写入告警和容器处理问题
-- 对这个项目来说，目标不是“文件里有几个字段”，而是“系统真的认它是 Live Photo”
+| 封面 | 长按后 |
+|------|--------|
+| ![AI 动漫形象](https://via.placeholder.com/300x400?text=AI+Anime) | ![真人视频](https://via.placeholder.com/300x400?text=Real+Video) |
+| AI 生成的动漫形象 | 你的真人自拍视频 |
 
-因此当前版本采用更稳妥的方式：通过 Python 调用基于 Apple 原生框架的实现来写入配对元数据。
+**效果：** "我变成二次元了！"
 
-### 安装
+### 🎪 2. 反差感内容
 
-要求：
+| 封面 | 长按后 |
+|------|--------|
+| ![精致海报](https://via.placeholder.com/300x400?text=Poster) | ![搞怪日常](https://via.placeholder.com/300x400?text=Daily+Life) |
+| 精致海报感照片 | 搞怪日常片段 |
 
-- macOS
-- Python 3.14+
+**效果：** "封面高冷，点开沙雕"
 
-安装依赖：
+### 📸 3. 回忆杀
+
+| 封面 | 长按后 |
+|------|--------|
+| ![修复老照片](https://via.placeholder.com/300x400?text=Old+Photo) | ![家人祝福](https://via.placeholder.com/300x400?text=Family+Video) |
+| AI 修复的老照片 | 家人说话的视频 |
+
+**效果：** 长辈看了都感动
+
+### 🐱 4. 宠物整活
+
+| 封面 | 长按后 |
+|------|--------|
+| ![宠物拟人](https://via.placeholder.com/300x400?text=Pet+Anime) | ![宠物日常](https://via.placeholder.com/300x400?text=Pet+Video) |
+| 宠物拟人插画 | 宠物真实动态 |
+
+**效果：** "毛孩子成精了！"
+
+---
+
+## 它和常见做法有什么不同？
+
+| 方案 | 能生成 Live Photo | 能指定封面图 | 能指定动态视频 | 能导出可导入资产 | 操作成本 |
+|------|:---:|:---:|:---:|:---:|:---:|
+| iPhone 直接拍摄 | ✅ | ❌ | ❌ | ✅ | 低 |
+| 相册/快捷指令拼装 | ⚠️ 看方案 | ⚠️ | ⚠️ | ⚠️ | 中 |
+| 手动折腾元数据 | ✅ | ✅ | ✅ | ⚠️ | 高 |
+| **isekai-live** | **✅** | **✅** | **✅** | **✅** | **低** |
+
+**核心价值不是"能做 Live Photo"。**
+
+而是：
+
+- ✅ **封面和动态内容可以解耦** — 随便搭配
+- ✅ **输出结果清晰可控** — 知道每个文件是什么
+- ✅ **流程足够短** — 适合反复试素材
+- ✅ **可脚本化** — 能接入自动化工作流
+
+---
+
+## 🚀 60 秒上手
+
+### 1️⃣ 安装
 
 ```bash
-python3 -m pip install --user --break-system-packages -e .
+# 克隆项目
+git clone https://github.com/farmcan/isekai-gate.git
+cd isekai-gate
+
+# 安装依赖
+pip install -e .
 ```
 
-### 一条命令跑起来
+> **要求：** Python `>= 3.14` + macOS（推荐）
 
-如果你已经在仓库根目录，并且已经安装了依赖，直接执行：
+### 2️⃣ 准备素材
 
-```bash
-PYTHONPATH=src python3 -m isekai_live --cover cover.jpg --video source.mov --output-dir out && open out/livephoto.pvt
+你只需要两份输入：
+
+```text
+assets/
+├── cover.jpg      # 封面图 (jpg/png/heic)
+└── clip.mov       # 视频 (mov/mp4)
 ```
 
-这条命令会：
+**建议：**
+- 📐 封面和视频尺寸匹配（推荐 1080x1920 竖屏）
+- ⏱️ 视频时长 3-5 秒最佳
 
-- 生成 `out/livephoto.*`
-- 生成 `out/livephoto.pvt`
-- 自动交给 macOS 打开，用于导入 Photos 预览
-
-### 用法
+### 3️⃣ 一条命令生成
 
 ```bash
-PYTHONPATH=src python3 -m isekai_live --cover cover.jpg --video source.mov --output-dir out
+isekai-live \
+  --cover assets/cover.jpg \
+  --video assets/clip.mov \
+  --output-dir output
 ```
 
-或者安装脚本入口后直接运行：
+成功后会输出：
 
-```bash
-isekai-live --cover cover.jpg --video source.mov --output-dir out
+```text
+✅ Image: output/livephoto.jpg
+✅ Video: output/livephoto.mov
+✅ Package: output/livephoto.pvt
+✅ Asset ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-如果你只想看帮助：
+### 4️⃣ 导入到照片
+
+在 macOS 上可直接打开 `.pvt` 包：
 
 ```bash
-PYTHONPATH=src python3 -m isekai_live --help
+open output/livephoto.pvt
 ```
 
-### 输出验证
+然后通过照片 App 同步到 iPhone，发朋友圈！
 
-当前仓库已经验证过以下结果：
+---
 
-- 命令能生成输出图片
-- 命令能生成输出视频
-- 命令能生成 `.pvt` 包
-- 输出图片和视频具有相同的 Live Photo ID
+## 📋 命令说明
 
-验证方式示例：
+### 基本格式
 
 ```bash
-python3 - <<'PY'
+isekai-live --cover <image> --video <video> --output-dir <dir>
+```
+
+### 参数表
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `--cover` | ✅ | 封面图片路径 (jpg/png/heic) |
+| `--video` | ✅ | 源视频路径 (mov/mp4) |
+| `--output-dir` | ✅ | 输出目录 |
+
+### 🎨 示例
+
+```bash
+# AI 图做封面，自拍视频做动态内容
+isekai-live --cover ./samples/anime.jpg --video ./samples/self.mov --output-dir ./output
+
+# 修复老照片做封面，家人祝福视频做动态内容
+isekai-live --cover ./samples/family.jpg --video ./samples/blessing.mov --output-dir ./output
+
+# 宠物插画做封面，宠物视频做动态内容
+isekai-live --cover ./samples/cat.png --video ./samples/cat.mov --output-dir ./output
+```
+
+---
+
+## 🏗️ 结构很简单，但很对
+
+`isekai-live` 的价值，不在于复杂。
+
+恰恰在于它把 Live Photo 生成这件事，收敛成了一个非常短的路径：
+
+```mermaid
+flowchart LR
+    A[📷 封面图] --> C[isekai-live]
+    B[🎬 源视频] --> C
+    C --> D[复制到输出目录]
+    D --> E[写入同一组 Live Photo 元数据]
+    E --> F[📄 配对图片]
+    E --> G[🎞️ 配对视频]
+    E --> H[📦 .pvt 导入包]
+    F --> I[iPhone / Photos 可识别]
+    G --> I
+    H --> I
+```
+
+这套流程的重点是：
+
+- ✅ **输入简单** — 一图一视频
+- ✅ **处理直接** — 复制、配对、写元数据
+- ✅ **输出明确** — 你能看到每个产物是什么
+- ✅ **接入轻量** — 命令行即可集成到自己的工作流
+
+---
+
+## 🛡️ 为什么它可靠？
+
+底层依赖 [`makelive`](https://github.com/RhetTbull/makelive) 来写入 Live Photo 所需元数据。
+
+项目做的事情很克制：
+
+```python
+# 1. 生成一个唯一 asset_id
+asset_id = str(uuid.uuid4())
+
+# 2. 把图片和视频复制到输出目录
+shutil.copy(cover, output_dir / "livephoto.jpg")
+shutil.copy(video, output_dir / "livephoto.mov")
+
+# 3. 为两者写入同一组 Live Photo 标识
+makelive(image_path, asset_id)
+makelive(video_path, asset_id)
+
+# 4. 导出 .pvt 包用于照片导入
+save_live_photo_pair_as_pvt(...)
+```
+
+也就是说，它不是"伪装成 Live Photo"。
+
+它做的是一组 **Apple 生态能识别的配对资产**。
+
+---
+
+## ❓ 常见问题
+
+### Q: 为什么它看起来像"封面骗人"？
+
+A: 因为 Live Photo 在很多场景下先展示静态封面，用户长按之后才播放动态内容。
+`isekai-live` 允许你主动指定这个封面，而不是被动接受视频中的某一帧。
+
+**这就是"惊喜"的来源！** 😉
+
+### Q: 适合什么视频长度？
+
+A: 短视频更自然。通常建议 **3-5 秒**，能更接近 Live Photo 的使用体验。
+
+### Q: 一定要在 macOS 上用吗？
+
+A: 命令本身是 Python CLI，跨平台。
+但 `.pvt` 导入包和后续导入照片的体验，**macOS + Photos** 会更顺滑。
+
+### Q: 它是编辑器吗？
+
+A: 不是。
+它不负责剪视频、抠图、生成 AI 图，它只负责把你已经准备好的素材组装成 Live Photo 资产。
+
+**简单说：你准备素材，它负责配对。**
+
+### Q: 能不能批量处理？
+
+A: 当前版本支持单次生成。
+如果你要批量化，可以直接在 shell 脚本或 Python 脚本里循环调用 CLI：
+
+```bash
+for cover in covers/*.jpg; do
+  isekai-live --cover $cover --video video.mov --output-dir output/$(basename $cover)
+done
+```
+
+### Q: 发朋友圈会被发现吗？
+
+A: 放心！在朋友圈预览里显示的是封面图，只有点开大图长按才会播放动态内容。
+
+**这就是"表里不一"的魅力！** 🎭
+
+---
+
+## 🎯 项目定位
+
+### ❌ 如果你想要的是：
+
+- 一个 GUI 修图软件
+- 一个带模板市场的内容平台
+- 一个自动生成 AI 封面的视频工作站
+
+那这个项目不是那个方向。
+
+### ✅ 如果你想要的是：
+
+> **"给我一张图，一个视频，一条命令，把它们变成 Live Photo。"**
+
+那它就是。
+
+---
+
+## 📦 输出文件说明
+
+```text
+output/
+├── livephoto.jpg      # 配对后的封面图（后缀随输入变化）
+├── livephoto.mov      # 配对后的视频（后缀随输入变化）
+└── livephoto.pvt      # macOS Photos 导入包
+```
+
+**验证配对：**
+
+```python
 from pathlib import Path
 from makelive import live_id, is_live_photo_pair
 
-image = Path("out/livephoto.jpg")
-video = Path("out/livephoto.mov")
+image = Path("output/livephoto.jpg")
+video = Path("output/livephoto.mov")
 
-print(live_id(image))
-print(live_id(video))
-print(is_live_photo_pair(image, video))
-PY
+print(f"图片 ID: {live_id(image)}")
+print(f"视频 ID: {live_id(video)}")
+print(f"配对成功：{is_live_photo_pair(image, video)}")
 ```
 
-如果三项结果一致，说明文件对已经被正确标记为同一组 Live Photo 资源。
+三项结果一致 = 配对成功 ✅
 
-### 如何预览
+---
 
-`HTML` 只能做效果模拟，不能验证 Apple 是否真的认这组文件是 Live Photo。
+## 🙏 致谢
 
-更可靠的预览方式是：
+- [`makelive`](https://github.com/RhetTbull/makelive) — 提供 Live Photo 元数据写入能力
 
-1. 把 `.pvt` 包导入 macOS Photos
-2. 或把生成的资源同步到 iPhone 相册
-3. 在系统相册里检查是否按 Live Photo 方式播放
+---
 
-最快路径：
+## 📄 License
 
-```bash
-PYTHONPATH=src python3 -m isekai_live --cover cover.jpg --video source.mov --output-dir out && open out/livephoto.pvt
-```
+MIT License — 随便用，记得 star 就好 ⭐
 
-### 项目状态
+---
 
-当前版本是第一版 CLI 骨架，重点在于：
+<p align="center">
+  <strong>Made with 🎭 for creative humans</strong>
+</p>
 
-- 生成可验证的资源对
-- 提供稳定的命令行接口
-- 为后续自研元数据写入、Photos 导入、AI 工作流集成留出接口
-
-## English
-
-### Goal
-
-`isekai-live` builds an Apple Photos-compatible Live Photo asset pair:
-
-- one still cover image
-- one motion video
-- one `.pvt` package for import into Photos
-
-The intended use case is a contrast effect such as:
-
-- anime-style cover image
-- real-person motion playback
-
-### Current Scope
-
-The current version ships a local Python CLI that:
-
-- accepts a cover image and a source video
-- copies them into an output directory
-- writes a shared Live Photo content identifier into both assets
-- creates a `.pvt` package for easier Photos import and validation
-
-Generated files:
-
-- `livephoto.jpg` or `livephoto.heic`
-- `livephoto.mov` or `livephoto.mp4`
-- `livephoto.pvt`
-
-### Why Not ffmpeg + exiftool
-
-This project tested an `ffmpeg + exiftool` path early on, but did not keep it as the main implementation because:
-
-- `exiftool` is not a reliable single solution for all Apple Live Photo metadata cases
-- `ffmpeg` is excellent for media processing, but not an ideal sole builder for Apple-specific pairing metadata
-- real execution exposed tag-writing warnings and container handling issues
-- the real success criterion is not "some fields exist", but "Apple systems recognize the pair as a Live Photo"
-
-For that reason, the current implementation uses a Python wrapper around a native-framework-based approach.
-
-### Install
-
-Requirements:
-
-- macOS
-- Python 3.14+
-
-Install the project:
-
-```bash
-python3 -m pip install --user --break-system-packages -e .
-```
-
-### One-Liner
-
-If you are already in the repository root and dependencies are installed, run:
-
-```bash
-PYTHONPATH=src python3 -m isekai_live --cover cover.jpg --video source.mov --output-dir out && open out/livephoto.pvt
-```
-
-This command will:
-
-- generate `out/livephoto.*`
-- generate `out/livephoto.pvt`
-- hand the package to macOS for Photos import preview
-
-### Usage
-
-```bash
-isekai-live --cover cover.jpg --video source.mov --output-dir out
-```
-
-If you have not installed the entrypoint yet:
-
-```bash
-PYTHONPATH=src python3 -m isekai_live --cover cover.jpg --video source.mov --output-dir out
-```
-
-If you only want help output:
-
-```bash
-PYTHONPATH=src python3 -m isekai_live --help
-```
-
-### Validation
-
-This repository has already validated the following:
-
-- the CLI generates an output image
-- the CLI generates an output video
-- the CLI generates a `.pvt` package
-- the image and video share the same Live Photo ID
-
-Validation example:
-
-```bash
-python3 - <<'PY'
-from pathlib import Path
-from makelive import live_id, is_live_photo_pair
-
-image = Path("out/livephoto.jpg")
-video = Path("out/livephoto.mov")
-
-print(live_id(image))
-print(live_id(video))
-print(is_live_photo_pair(image, video))
-PY
-```
-
-Matching results indicate that both files are tagged as the same Live Photo pair.
-
-### Preview
-
-An `HTML` page can simulate the effect, but it cannot prove that Apple Photos recognizes the output as a Live Photo.
-
-For real validation, use:
-
-1. import the `.pvt` package into macOS Photos
-2. or sync the generated assets to an iPhone
-3. verify playback in the system Photos app
-
-Fastest path:
-
-```bash
-PYTHONPATH=src python3 -m isekai_live --cover cover.jpg --video source.mov --output-dir out && open out/livephoto.pvt
-```
-
-### Status
-
-This is the first CLI-focused version. Its priorities are:
-
-- generating verifiable asset pairs
-- providing a stable command-line interface
-- leaving room for future native metadata work, Photos import automation, and AI pipeline integration
+<p align="center">
+  有问题？提 Issue | 有创意？分享你的作品！
+</p>
