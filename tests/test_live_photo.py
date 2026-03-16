@@ -12,6 +12,7 @@ if str(SRC) not in sys.path:
 from isekai_live.live_photo import (
     LivePhotoArtifacts,
     build_live_photo,
+    extract_live_photo_pair,
     generate_asset_id,
     write_live_photo_pair,
 )
@@ -59,3 +60,51 @@ class LivePhotoTests(unittest.TestCase):
         self.assertEqual(copy_mock.call_count, 2)
         make_mock.assert_called_once_with(plan.paired_image, plan.paired_video, asset_id="id")
         pvt_mock.assert_called_once_with(plan.paired_image, plan.paired_video, plan.pvt_package.parent, "id")
+
+    def test_extract_live_photo_pair_raises_on_missing_file(self) -> None:
+        with self.assertRaises(FileNotFoundError):
+            extract_live_photo_pair(Path("/nonexistent/file.jpg"))
+
+    def test_extract_live_photo_pair_raises_on_unsupported_extension(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            test_file = Path(tmpdir) / "test.txt"
+            test_file.write_text("test")
+
+            with self.assertRaises(ValueError):
+                extract_live_photo_pair(test_file)
+
+    def test_extract_live_photo_pair_raises_when_no_paired_file(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            cover = Path(tmpdir) / "photo.jpg"
+            cover.write_bytes(b"fake image")
+
+            with self.assertRaises(RuntimeError):
+                extract_live_photo_pair(cover)
+
+    def test_extract_live_photo_pair_finds_pair_from_image(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            cover = Path(tmpdir) / "photo.jpg"
+            video = Path(tmpdir) / "photo.mov"
+            cover.write_bytes(b"fake image")
+            video.write_bytes(b"fake video")
+
+            with patch("isekai_live.live_photo.is_live_photo_pair", return_value="test-asset-id"):
+                artifacts = extract_live_photo_pair(cover)
+
+            self.assertEqual(artifacts.paired_image, cover)
+            self.assertEqual(artifacts.paired_video, video)
+            self.assertEqual(artifacts.asset_id, "test-asset-id")
+
+    def test_extract_live_photo_pair_finds_pair_from_video(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            cover = Path(tmpdir) / "photo.jpg"
+            video = Path(tmpdir) / "photo.mov"
+            cover.write_bytes(b"fake image")
+            video.write_bytes(b"fake video")
+
+            with patch("isekai_live.live_photo.is_live_photo_pair", return_value="test-asset-id"):
+                artifacts = extract_live_photo_pair(video)
+
+            self.assertEqual(artifacts.paired_image, cover)
+            self.assertEqual(artifacts.paired_video, video)
+            self.assertEqual(artifacts.asset_id, "test-asset-id")
