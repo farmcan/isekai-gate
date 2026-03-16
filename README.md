@@ -345,6 +345,26 @@ print(f"配对成功：{is_live_photo_pair(image, video)}")
 
 ---
 
+## 🧪 测试
+
+想快速体验但不想准备素材？直接用 `makelive` 项目的官方测试文件：
+
+```bash
+# 下载官方测试文件（约 9MB）
+curl -LO https://raw.githubusercontent.com/RhetTbull/makelive/main/tests/test.jpeg
+curl -LO https://raw.githubusercontent.com/RhetTbull/makelive/main/tests/test.mov
+
+# 生成 Live Photo
+isekai-live build --cover test.jpeg --video test.mov --output-dir output
+
+# 导入 Photos 预览
+open output/livephoto.pvt
+```
+
+**测试文件来源：** [makelive/tests](https://github.com/RhetTbull/makelive/tree/main/tests)
+
+---
+
 ## 📄 License
 
 MIT License — 随便用，记得 star 就好 ⭐
