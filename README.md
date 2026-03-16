@@ -221,6 +221,101 @@ isekai-live remix --input original.jpg --new-cover ai_cover.jpg --output-dir fin
 
 ---
 
+## 🤖 AI 封面生成
+
+使用 AI 图像生成 API，一键将现有封面转换为不同艺术风格！
+
+### 🎨 支持的 AI 提供商
+
+| 提供商 | API | 功能 |
+|--------|-----|------|
+| **Qwen (通义千问)** | 阿里云 DashScope | 图生图、风格转换 |
+| **Gemini** | Google Generative AI | 图生图、风格转换 |
+
+### 🚀 快速开始
+
+```bash
+# 使用 Qwen 生成动漫风格封面
+isekai-live ai-cover \
+  --input livephoto.jpg \
+  --prompt "anime style portrait" \
+  --provider qwen \
+  --output ai_cover.jpg
+
+# 使用 Gemini 生成油画风格封面
+isekai-live ai-cover \
+  --input livephoto.jpg \
+  --prompt "oil painting style" \
+  --provider gemini \
+  --output ai_cover.jpg
+```
+
+### 🔑 API Key 配置
+
+可以通过两种方式提供 API Key：
+
+**方式 1：命令行参数**
+```bash
+isekai-live ai-cover --input livephoto.jpg --prompt "anime style" \
+  --provider qwen --qwen-key YOUR_QWEN_API_KEY --output ai_cover.jpg
+```
+
+**方式 2：环境变量**
+```bash
+export QWEN_API_KEY=your_qwen_api_key
+export GEMINI_API_KEY=your_gemini_api_key
+
+isekai-live ai-cover --input livephoto.jpg --prompt "anime style" \
+  --provider qwen --output ai_cover.jpg
+```
+
+### 🎭 常用风格提示词
+
+| 风格 | 提示词示例 |
+|------|-----------|
+| 动漫风格 | `anime style portrait`, `manga illustration`, `Studio Ghibli style` |
+| 油画 | `oil painting`, `classical portrait`, `impasto style` |
+| 水彩画 | `watercolor painting`, `soft watercolor style` |
+| 像素艺术 | `pixel art`, `8-bit style`, `retro game art` |
+| 赛博朋克 | `cyberpunk style`, `neon lights`, `futuristic` |
+| 素描 | `pencil sketch`, `black and white drawing` |
+| 3D 渲染 | `3D render`, `CGI`, `Pixar style` |
+
+### 🔄 完整工作流
+
+```bash
+# 1. 从现有 Live Photo 提取封面
+isekai-live extract --input original.jpg --output-dir assets/
+
+# 2. 用 AI 生成新风格封面
+isekai-live ai-cover \
+  --input assets/cover.jpg \
+  --prompt "anime style portrait, vibrant colors" \
+  --provider qwen \
+  --output ai_cover.jpg
+
+# 3. 用新封面 Remix Live Photo
+isekai-live remix \
+  --input original.jpg \
+  --new-cover ai_cover.jpg \
+  --output-dir remixed/
+
+# 4. 导入 Photos 预览
+open remixed/livephoto.pvt
+```
+
+### ⚙️ 实现说明
+
+当前版本的 AI 封面生成功能提供了**骨架代码**，用户需要根据自己的 API 订阅实现具体的 API 调用。
+
+**需要实现的 API：**
+- **Qwen**: 阿里云 DashScope API (wanx-v1 模型)
+- **Gemini**: Google Generative AI API
+
+详见源代码：`src/isekai_live/ai_cover.py`
+
+---
+
 ## 📋 命令说明
 
 ### 基本格式

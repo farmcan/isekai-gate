@@ -10,6 +10,7 @@ from typing import Sequence, TextIO
 
 from .deps import ensure_dependencies, ensure_file_exists
 from .live_photo import build_live_photo, extract_live_photo_pair
+from .ai_cover import AIProvider, generate_cover
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -88,6 +89,50 @@ def build_parser() -> argparse.ArgumentParser:
         help="Keep the original asset ID (default: generate new ID).",
     )
     
+    # ai-cover subcommand
+    ai_cover_parser = subparsers.add_parser(
+        "ai-cover",
+        aliases=["generate-cover"],
+        help="Generate a new Live Photo cover using AI image generation.",
+    )
+    ai_cover_parser.add_argument(
+        "--input",
+        required=True,
+        type=Path,
+        help="Path to the input image (existing Live Photo cover).",
+    )
+    ai_cover_parser.add_argument(
+        "--prompt",
+        required=True,
+        type=str,
+        help="Text prompt describing the desired style (e.g., 'anime style portrait', 'oil painting', 'watercolor', 'pixel art').",
+    )
+    ai_cover_parser.add_argument(
+        "--provider",
+        required=True,
+        type=str,
+        choices=["qwen", "gemini"],
+        help="AI provider to use for image generation.",
+    )
+    ai_cover_parser.add_argument(
+        "--output",
+        required=True,
+        type=Path,
+        help="Path to save the generated cover image.",
+    )
+    ai_cover_parser.add_argument(
+        "--qwen-key",
+        type=str,
+        default=None,
+        help="Qwen (Alibaba DashScope) API key. Can also use QWEN_API_KEY environment variable.",
+    )
+    ai_cover_parser.add_argument(
+        "--gemini-key",
+        type=str,
+        default=None,
+        help="Gemini (Google Generative AI) API key. Can also use GEMINI_API_KEY environment variable.",
+    )
+    
     return parser
 
 
@@ -157,6 +202,42 @@ def cmd_remix(args, out_stream, stream) -> int:
     return 0
 
 
+def cmd_ai_cover(args, out_stream, stream) -> int:
+    """Handle the ai-cover subcommand."""
+    ensure_dependencies()
+    ensure_file_exists(args.input, "Input image")
+    
+    # Ensure output directory exists
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Map provider string to enum
+    provider = AIProvider(args.provider)
+    
+    try:
+        generated_path = generate_cover(
+            input_image=args.input,
+            prompt=args.prompt,
+            output_path=args.output,
+            provider=provider,
+            qwen_key=args.qwen_key,
+            gemini_key=args.gemini_key,
+        )
+        out_stream.write(f"Generated AI cover: {generated_path}\n")
+        out_stream.write(f"Provider: {provider.value}\n")
+        out_stream.write(f"Prompt: {args.prompt}\n")
+        return 0
+    except NotImplementedError as exc:
+        stream.write(f"{exc}\n")
+        stream.write(
+            "\nTo use this feature, please implement the API integration in src/isekai_live/ai_cover.py\n"
+            "See the TODO comments in the source code for guidance on Qwen/Gemini API usage.\n"
+        )
+        return 1
+    except RuntimeError as exc:
+        stream.write(f"{exc}\n")
+        return 1
+
+
 def main(
     argv: Sequence[str] | None = None,
     stdout: TextIO | None = None,
@@ -175,6 +256,8 @@ def main(
             return cmd_extract(args, out_stream, stream)
         elif args.command == "remix":
             return cmd_remix(args, out_stream, stream)
+        elif args.command in ("ai-cover", "generate-cover"):
+            return cmd_ai_cover(args, out_stream, stream)
         else:
             stream.write(f"Unknown command: {args.command}\n")
             return 1
