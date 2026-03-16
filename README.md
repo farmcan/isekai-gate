@@ -42,6 +42,7 @@ The result is not just "a moving photo". It is a deliberately designed preview-t
 - `remix`: replace one side and rebuild
 - `ai-cover`: generate a stylized cover image from an existing one
 - `ai-video`: generate a stylized video from an existing clip
+- `export-demo`: export a demo MP4 and optional GIF from a cover image and video
 
 ## Status
 
@@ -159,6 +160,34 @@ isekai-live build \
 open output/livephoto.pvt
 ```
 
+Complete AI workflow: stylized cover + original video -> Live Photo:
+
+```bash
+isekai-live ai-cover \
+  --input test.jpeg \
+  --prompt "Turn this photo into a clean cartoon illustration while keeping the original subject and composition." \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output cartoon.png
+
+isekai-live build \
+  --cover cartoon.png \
+  --video test.mov \
+  --output-dir output-ai-cover
+
+open output-ai-cover/livephoto.pvt
+```
+
+Export a reproducible demo MP4 and GIF:
+
+```bash
+isekai-live export-demo \
+  --cover test.jpeg \
+  --video stylized.mp4 \
+  --output-mp4 demo.mp4 \
+  --output-gif demo.gif
+```
+
 ## What A Live Photo Really Is
 
 From a user perspective, a Live Photo looks like one photo.
@@ -215,6 +244,24 @@ isekai-live ai-video \
 
 isekai-live build --cover test.jpeg --video stylized.mp4 --output-dir output-ai-video
 open output-ai-video/livephoto.pvt
+
+# stylized cover + original video
+isekai-live ai-cover \
+  --input test.jpeg \
+  --prompt "Turn this photo into a clean cartoon illustration while keeping the original subject and composition." \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output cartoon.png
+
+isekai-live build --cover cartoon.png --video test.mov --output-dir output-ai-cover
+open output-ai-cover/livephoto.pvt
+
+# export a shareable demo
+isekai-live export-demo \
+  --cover test.jpeg \
+  --video stylized.mp4 \
+  --output-mp4 demo.mp4 \
+  --output-gif demo.gif
 ```
 
 Source: [`makelive/tests`](https://github.com/RhetTbull/makelive/tree/main/tests)

@@ -266,3 +266,34 @@ class CliTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         self.assertIn("Generated AI video", stdout.getvalue())
         self.assertIn("Style: anime", stdout.getvalue())
+
+    def test_main_export_demo_reports_generated_outputs_on_success(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            cover_file = Path(tmpdir) / "cover.jpg"
+            video_file = Path(tmpdir) / "clip.mp4"
+            output_mp4 = Path(tmpdir) / "demo.mp4"
+            output_gif = Path(tmpdir) / "demo.gif"
+            cover_file.write_bytes(b"fake image")
+            video_file.write_bytes(b"fake video")
+            stdout = StringIO()
+
+            with patch("isekai_live.cli.ensure_dependencies"):
+                with patch("isekai_live.cli.export_demo_media", return_value=(output_mp4, output_gif)):
+                    exit_code = main(
+                        [
+                            "export-demo",
+                            "--cover",
+                            str(cover_file),
+                            "--video",
+                            str(video_file),
+                            "--output-mp4",
+                            str(output_mp4),
+                            "--output-gif",
+                            str(output_gif),
+                        ],
+                        stdout=stdout,
+                    )
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("Demo MP4", stdout.getvalue())
+        self.assertIn("Demo GIF", stdout.getvalue())

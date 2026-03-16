@@ -42,6 +42,7 @@
 - `remix`：替换其中一侧并重新构建
 - `ai-cover`：从已有封面生成新的风格化图片
 - `ai-video`：把已有视频做成风格化版本
+- `export-demo`：从封面图和视频导出演示 mp4 / gif
 
 ## 当前状态
 
@@ -159,6 +160,34 @@ isekai-live build \
 open output/livephoto.pvt
 ```
 
+完整 AI 工作流：风格化封面 + 原视频 -> Live Photo：
+
+```bash
+isekai-live ai-cover \
+  --input test.jpeg \
+  --prompt "把这张照片改成高质量卡通插画风格，保留主体构图与姿态，颜色明快，细节干净" \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output cartoon.png
+
+isekai-live build \
+  --cover cartoon.png \
+  --video test.mov \
+  --output-dir output-ai-cover
+
+open output-ai-cover/livephoto.pvt
+```
+
+把效果导出成可分享的演示 mp4 / gif：
+
+```bash
+isekai-live export-demo \
+  --cover test.jpeg \
+  --video stylized.mp4 \
+  --output-mp4 demo.mp4 \
+  --output-gif demo.gif
+```
+
 ## Live Photo 其实是什么
 
 从用户视角看，Live Photo 像一张会动的照片。
@@ -215,6 +244,24 @@ isekai-live ai-video \
 
 isekai-live build --cover test.jpeg --video stylized.mp4 --output-dir output-ai-video
 open output-ai-video/livephoto.pvt
+
+# 风格化封面 + 原视频
+isekai-live ai-cover \
+  --input test.jpeg \
+  --prompt "把这张照片改成高质量卡通插画风格，保留主体构图与姿态，颜色明快，细节干净" \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output cartoon.png
+
+isekai-live build --cover cartoon.png --video test.mov --output-dir output-ai-cover
+open output-ai-cover/livephoto.pvt
+
+# 导出演示素材
+isekai-live export-demo \
+  --cover test.jpeg \
+  --video stylized.mp4 \
+  --output-mp4 demo.mp4 \
+  --output-gif demo.gif
 ```
 
 来源：[`makelive/tests`](https://github.com/RhetTbull/makelive/tree/main/tests)

@@ -12,6 +12,7 @@ from .deps import ensure_dependencies, ensure_file_exists
 from .live_photo import build_live_photo, extract_live_photo_pair
 from .ai_cover import AIProvider, generate_cover
 from .ai_video import VideoStyle, generate_stylized_video_qwen
+from .demo_media import export_demo_media
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -175,6 +176,15 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Qwen (Alibaba DashScope) API key. Can also use QWEN_API_KEY environment variable.",
     )
+
+    export_demo_parser = subparsers.add_parser(
+        "export-demo",
+        help="Export a short demo MP4 and optional GIF from a cover image and video.",
+    )
+    export_demo_parser.add_argument("--cover", required=True, type=Path, help="Path to the cover image.")
+    export_demo_parser.add_argument("--video", required=True, type=Path, help="Path to the demo source video.")
+    export_demo_parser.add_argument("--output-mp4", required=True, type=Path, help="Path to save the demo MP4.")
+    export_demo_parser.add_argument("--output-gif", type=Path, default=None, help="Optional path to save a demo GIF.")
     
     return parser
 
@@ -305,6 +315,27 @@ def cmd_ai_video(args, out_stream, stream) -> int:
         return 1
 
 
+def cmd_export_demo(args, out_stream, stream) -> int:
+    """Handle the export-demo subcommand."""
+    ensure_dependencies()
+    ensure_file_exists(args.cover, "Cover image")
+    ensure_file_exists(args.video, "Source video")
+    try:
+        output_mp4, output_gif = export_demo_media(
+            cover_image=args.cover,
+            source_video=args.video,
+            output_mp4=args.output_mp4,
+            output_gif=args.output_gif,
+        )
+        out_stream.write(f"Demo MP4: {output_mp4}\n")
+        if output_gif is not None:
+            out_stream.write(f"Demo GIF: {output_gif}\n")
+        return 0
+    except RuntimeError as exc:
+        stream.write(f"{exc}\n")
+        return 1
+
+
 def main(
     argv: Sequence[str] | None = None,
     stdout: TextIO | None = None,
@@ -327,6 +358,8 @@ def main(
             return cmd_ai_cover(args, out_stream, stream)
         elif args.command == "ai-video":
             return cmd_ai_video(args, out_stream, stream)
+        elif args.command == "export-demo":
+            return cmd_export_demo(args, out_stream, stream)
         else:
             stream.write(f"Unknown command: {args.command}\n")
             return 1
