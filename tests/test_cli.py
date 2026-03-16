@@ -236,3 +236,33 @@ class CliTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         self.assertIn("Generated AI cover", stdout.getvalue())
         self.assertIn("Provider: qwen", stdout.getvalue())
+
+    def test_main_ai_video_reports_generated_output_on_success(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            input_file = Path(tmpdir) / "clip.mov"
+            output_file = Path(tmpdir) / "stylized.mp4"
+            input_file.write_bytes(b"fake video")
+            stdout = StringIO()
+
+            with patch("isekai_live.cli.ensure_dependencies"):
+                with patch("isekai_live.cli.generate_stylized_video_qwen", return_value=output_file):
+                    exit_code = main(
+                        [
+                            "ai-video",
+                            "--input-video",
+                            str(input_file),
+                            "--style",
+                            "anime",
+                            "--provider",
+                            "qwen",
+                            "--output",
+                            str(output_file),
+                            "--qwen-key",
+                            "sk-test",
+                        ],
+                        stdout=stdout,
+                    )
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("Generated AI video", stdout.getvalue())
+        self.assertIn("Style: anime", stdout.getvalue())

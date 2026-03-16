@@ -2,43 +2,46 @@
 
 [English README](./README.md)
 
-从指定封面图和视频出发，构建、提取、重混并导入可被 Photos 识别的 Live Photo 资产。
+从一张指定静态图和一段指定视频出发，构建 Live Photo，并导出成 Photos 真正能导入的资产。
 
-`isekai-live` 是一个偏创作工作流的命令行工具，适合这类场景：
+如果只看表面，这个工具做的事情很简单：
 
-- 用一张指定静态图作为 Live Photo 封面
-- 用一段指定视频作为动态内容
-- 提取并重混已有的 Live Photo
-- 用 AI 生成风格化封面，再重新打包回 Live Photo
+- 选一张你想让别人先看到的封面图
+- 选一段你想在长按时播放的视频
+- 构建或 remix 成新的 Live Photo
+- 导入 Photos，验证它是不是你真正想要的结果
 
-它不是完整编辑器，重点在于资产配对、打包，以及可重复执行的 CLI 工作流。
+它不是完整的图片编辑器或视频编辑器，而是一个偏创作工作流的 CLI。
 
-## 项目定位
+## 这件事为什么有意思
 
-大多数 Live Photo 工具要么偏拍摄，要么偏底层元数据处理。
+大多数 Live Photo 工具，要么偏拍摄，要么偏底层元数据写入。
 
-这个项目把常见操作收敛成清晰的命令行工作流：
+`isekai-live` 想做得更具体一点：它允许你把封面和动态内容解耦。
 
-- `build`：由图片 + 视频构建 Live Photo 资产
+这意味着你可以做这样的东西：
+
+- 用一张 AI 头像做封面，长按后播放真人自拍视频
+- 用一张修复后的老照片做封面，长按后播放家庭片段
+- 用一张宠物插画做封面，长按后播放宠物真实视频
+
+这样做出来的就不只是“一张会动的照片”，而是一个被重新设计过的预览到展开的体验。
+
+## CLI 能做什么
+
+- `build`：由图片 + 视频构建 Live Photo
 - `extract`：从已有 Live Photo 中提取封面和视频
 - `remix`：替换其中一侧并重新构建
-- `ai-cover`：从已有封面生成新的 AI 风格封面
-
-这个项目的价值不在于“从零发明 Live Photo”，而在于把工作流做得更清楚、可脚本化、便于反复试素材。
+- `ai-cover`：从已有封面生成新的风格化图片
+- `ai-video`：把已有视频做成风格化版本
 
 ## 当前状态
 
 - `build`、`extract`、`remix`：已实现
 - `ai-cover --provider qwen`：已实现
+- `ai-video --provider qwen`：已实现
 - `ai-cover --provider gemini`：CLI 接口已预留，实际 API 还未实现
 - `png` 封面可直接输入；在 `build` / `remix` 时会按需自动转成 `jpeg`
-
-## 环境要求
-
-- Python `>= 3.14`
-- 推荐 macOS
-- `pip install -e .`
-- 如果要使用 Qwen AI 封面生成，需要 DashScope API key（`sk-...`）
 
 ## 安装
 
@@ -47,6 +50,12 @@ git clone https://github.com/farmcan/isekai-gate.git
 cd isekai-gate
 pip install -e .
 ```
+
+环境要求：
+
+- Python `>= 3.14`
+- 推荐 macOS
+- 如果要用 Qwen AI 封面生成，需要 DashScope API key（`sk-...`）
 
 ## 快速开始
 
@@ -58,7 +67,7 @@ assets/
 └── clip.mov
 ```
 
-构建 Live Photo 包：
+构建 Live Photo：
 
 ```bash
 isekai-live build \
@@ -76,21 +85,15 @@ Package: output/livephoto.pvt
 Asset ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-在 macOS Photos 中导入：
+导入到 macOS Photos：
 
 ```bash
 open output/livephoto.pvt
 ```
 
-## 示例
+## 两个最有代表性的例子
 
-提取已有 Live Photo：
-
-```bash
-isekai-live extract --input livephoto.jpg --output-dir extracted/
-```
-
-替换封面后重混：
+给已有 Live Photo 换一张封面：
 
 ```bash
 isekai-live remix \
@@ -99,18 +102,7 @@ isekai-live remix \
   --output-dir remixed/
 ```
 
-使用 Qwen 生成风格化封面：
-
-```bash
-isekai-live ai-cover \
-  --input assets/cover.jpg \
-  --prompt "把这张照片改成高质量卡通插画风格，保留主体构图与姿态，颜色明快，细节干净" \
-  --provider qwen \
-  --qwen-key YOUR_DASHSCOPE_API_KEY \
-  --output ai_cover.png
-```
-
-完整 AI 工作流：
+先用 Qwen 生成新封面，再重新打包回 Live Photo：
 
 ```bash
 isekai-live extract --input original.jpg --output-dir assets/
@@ -130,9 +122,32 @@ isekai-live remix \
 open remixed/livephoto.pvt
 ```
 
+用 Qwen 给现有视频做风格化：
+
+```bash
+isekai-live ai-video \
+  --input-video clip.mov \
+  --style anime \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output stylized.mp4
+```
+
+## Live Photo 其实是什么
+
+从用户视角看，Live Photo 像一张会动的照片。
+
+从实现角度看，它更像一组配对资产：
+
+- 一张静态图片负责预览
+- 一段短视频负责动态内容
+- 两者共享同一个标识，Photos 才会把它们识别为同一条 Live Photo
+
+所以，光是本地生成了文件还不够。真正的验收标准，是 Photos 能不能导入并正确播放。
+
 ## 如何验证结果
 
-验证要分两层看：
+验证至少要分两层：
 
 1. 资产层验证
 - 确认生成了 `livephoto.jpg`、`livephoto.mov`、`livephoto.pvt`
@@ -142,18 +157,17 @@ open remixed/livephoto.pvt
 2. Photos 层验证
 - 把 `.pvt` 导入 macOS Photos
 - 确认 Photos 将其识别为 Live Photo
-- 确认长按 / 播放时行为正确
+- 确认长按或播放时行为正确
 
-为什么必须这样验证：
-
-只看到文件生成成功，并不能证明 Apple Photos 会把它当成真正可用的 Live Photo。端到端验收标准仍然是：`.pvt` 可导入，并且导入后的播放行为正确。
+为什么必须这样验证：命令跑完了，并不等于 Apple Photos 会把它当成真正可用的 Live Photo。
 
 ## AI 封面说明
 
 - Qwen 走阿里云 DashScope 图生图接口
+- `ai-video` 走 Qwen 视频风格化接口
 - 可以通过 `--qwen-key` 传 key，也可以设置 `QWEN_API_KEY`
 - 生成结果会直接写入 `--output`
-- 如果输出是 `png`，后续 `build` / `remix` 会自动转成 `jpeg` 再打包
+- 如果输出是 `png`，后续 `build` 或 `remix` 会自动转成 `jpeg` 再打包
 
 ## 官方测试素材
 
@@ -171,11 +185,11 @@ open output/livephoto.pvt
 
 这个项目依赖 [`makelive`](https://github.com/RhetTbull/makelive) 完成 Live Photo 元数据写入和 `.pvt` 打包。
 
-这一点应该明确写出来。这个项目本身的贡献在于围绕它补齐完整工作流：
+这点是明确且有意为之的。这个项目真正补的是围绕它的工作流：
 
 - 清晰的 CLI 入口
 - 可复现的输出结果
-- `extract / remix` 循环
+- `extract / remix` 的闭环
 - AI 封面生成再回流到 Live Photo 打包
 
 ## License

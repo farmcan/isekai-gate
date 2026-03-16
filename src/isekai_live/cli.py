@@ -11,6 +11,7 @@ from typing import Sequence, TextIO
 from .deps import ensure_dependencies, ensure_file_exists
 from .live_photo import build_live_photo, extract_live_photo_pair
 from .ai_cover import AIProvider, generate_cover
+from .ai_video import VideoStyle, generate_stylized_video_qwen
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -132,6 +133,48 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Gemini (Google Generative AI) API key. Can also use GEMINI_API_KEY environment variable.",
     )
+
+    ai_video_parser = subparsers.add_parser(
+        "ai-video",
+        help="Generate a stylized video using AI video transformation.",
+    )
+    ai_video_parser.add_argument(
+        "--input-video",
+        required=True,
+        type=Path,
+        help="Path to the input video.",
+    )
+    ai_video_parser.add_argument(
+        "--style",
+        required=True,
+        choices=[style.value for style in VideoStyle],
+        help="Preset style for the stylized video.",
+    )
+    ai_video_parser.add_argument(
+        "--provider",
+        required=True,
+        choices=["qwen"],
+        help="AI provider to use for video stylization.",
+    )
+    ai_video_parser.add_argument(
+        "--output",
+        required=True,
+        type=Path,
+        help="Path to save the generated video.",
+    )
+    ai_video_parser.add_argument(
+        "--resolution",
+        type=int,
+        choices=[540, 720],
+        default=540,
+        help="Output short-edge resolution. Affects pricing on DashScope.",
+    )
+    ai_video_parser.add_argument(
+        "--qwen-key",
+        type=str,
+        default=None,
+        help="Qwen (Alibaba DashScope) API key. Can also use QWEN_API_KEY environment variable.",
+    )
     
     return parser
 
@@ -238,6 +281,30 @@ def cmd_ai_cover(args, out_stream, stream) -> int:
         return 1
 
 
+def cmd_ai_video(args, out_stream, stream) -> int:
+    """Handle the ai-video subcommand."""
+    ensure_dependencies()
+    ensure_file_exists(args.input_video, "Input video")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        generated_path = generate_stylized_video_qwen(
+            input_video=args.input_video,
+            output_path=args.output,
+            style=VideoStyle(args.style),
+            api_key=args.qwen_key,
+            resolution=args.resolution,
+        )
+        out_stream.write(f"Generated AI video: {generated_path}\n")
+        out_stream.write(f"Provider: {args.provider}\n")
+        out_stream.write(f"Style: {args.style}\n")
+        out_stream.write(f"Resolution: {args.resolution}\n")
+        return 0
+    except RuntimeError as exc:
+        stream.write(f"{exc}\n")
+        return 1
+
+
 def main(
     argv: Sequence[str] | None = None,
     stdout: TextIO | None = None,
@@ -258,6 +325,8 @@ def main(
             return cmd_remix(args, out_stream, stream)
         elif args.command in ("ai-cover", "generate-cover"):
             return cmd_ai_cover(args, out_stream, stream)
+        elif args.command == "ai-video":
+            return cmd_ai_video(args, out_stream, stream)
         else:
             stream.write(f"Unknown command: {args.command}\n")
             return 1

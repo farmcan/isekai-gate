@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
   "makelive>=0.6.2",
+  "requests>=2.31.0",
 ]
 license = { text = "MIT" }
 authors = [
