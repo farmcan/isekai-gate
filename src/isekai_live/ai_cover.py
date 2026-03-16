@@ -2,10 +2,23 @@
 
 from __future__ import annotations
 
+import base64
+import json
+import mimetypes
 import os
+import time
 from enum import Enum
 from pathlib import Path
 from typing import Protocol
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
+
+QWEN_IMAGE_ENDPOINT = "https://dashscope.aliyuncs.com/api/v1/services/aigc/image2image/image-synthesis"
+QWEN_TASK_ENDPOINT = "https://dashscope.aliyuncs.com/api/v1/tasks/{task_id}"
+QWEN_MODEL = "wanx2.1-imageedit"
+QWEN_FUNCTION = "stylization_all"
+QWEN_TERMINAL_STATES = {"SUCCEEDED", "FAILED", "CANCELED"}
 
 
 class AIProvider(str, Enum):
@@ -81,38 +94,21 @@ def generate_cover_qwen(
         NotImplementedError: If the API implementation is not yet complete.
     """
     api_key = api_key or get_api_key(AIProvider.QWEN)
-    
-    # TODO: Implement actual Qwen DashScope API call
-    # This is a skeleton implementation - users should add their API integration
-    # 
-    # Example structure for Qwen API:
-    # import dashscope
-    # from dashscope import ImageSynthesis
-    # 
-    # dashscope.api_key = api_key
-    # response = ImageSynthesis.call(
-    #     model='wanx-v1',
-    #     prompt=prompt,
-    #     image=input_image.as_posix(),
-    #     n=1,
-    #     size='1024*1024'
-    # )
-    # 
-    # if response.status_code == 200:
-    #     result_url = response.output.results[0].url
-    #     # Download and save the image
-    #     import requests
-    #     img_data = requests.get(result_url).content
-    #     with open(output_path, 'wb') as f:
-    #         f.write(img_data)
-    # else:
-    #     raise RuntimeError(f"Qwen API error: {response.message}")
-    
-    raise NotImplementedError(
-        "Qwen API integration is a skeleton. "
-        "Please implement the DashScope API call in ai_cover.py. "
-        "See the TODO comments in the source code for guidance."
-    )
+    create_payload = {
+        "model": QWEN_MODEL,
+        "input": {
+            "function": QWEN_FUNCTION,
+            "prompt": prompt,
+            "base_image_url": _encode_image_as_data_url(input_image),
+        },
+        "parameters": {},
+    }
+    response = _dashscope_post_json(QWEN_IMAGE_ENDPOINT, api_key=api_key, payload=create_payload)
+    task_id = _extract_qwen_task_id(response)
+    result = _poll_qwen_task(task_id, api_key=api_key)
+    result_url = _extract_qwen_result_url(result)
+    output_path.write_bytes(_download_binary(result_url))
+    return output_path
 
 
 def generate_cover_gemini(
@@ -137,28 +133,6 @@ def generate_cover_gemini(
         NotImplementedError: If the API implementation is not yet complete.
     """
     api_key = api_key or get_api_key(AIProvider.GEMINI)
-    
-    # TODO: Implement actual Gemini API call
-    # This is a skeleton implementation - users should add their API integration
-    #
-    # Example structure for Gemini API:
-    # import google.generativeai as genai
-    # from PIL import Image
-    # 
-    # genai.configure(api_key=api_key)
-    # model = genai.GenerativeModel('gemini-pro-vision')
-    # 
-    # input_img = Image.open(input_image)
-    # response = model.generate_content([
-    #     prompt,
-    #     input_img
-    # ])
-    # 
-    # # Note: Gemini may return image data differently depending on the model
-    # # You may need to use Imagen API or handle the response appropriately
-    # 
-    # # Save the generated image
-    # generated_img.save(output_path)
     
     raise NotImplementedError(
         "Gemini API integration is a skeleton. "
@@ -214,3 +188,80 @@ def generate_cover(
         )
     else:
         raise ValueError(f"Unsupported provider: {provider}. Use 'qwen' or 'gemini'.")
+
+
+def _encode_image_as_data_url(input_image: Path) -> str:
+    mime_type, _ = mimetypes.guess_type(input_image.name)
+    if not mime_type:
+        mime_type = "application/octet-stream"
+    encoded = base64.b64encode(input_image.read_bytes()).decode("ascii")
+    return f"data:{mime_type};base64,{encoded}"
+
+
+def _dashscope_post_json(url: str, *, api_key: str, payload: dict | None) -> dict:
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Accept": "application/json",
+        "X-DashScope-Async": "enable",
+    }
+    data = None
+    if payload is not None:
+        headers["Content-Type"] = "application/json"
+        data = json.dumps(payload).encode("utf-8")
+    request = Request(url, data=data, headers=headers, method="POST" if payload is not None else "GET")
+    try:
+        with urlopen(request, timeout=120) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Qwen API request failed with HTTP {exc.code}: {body}") from exc
+    except URLError as exc:
+        raise RuntimeError(f"Qwen API request failed: {exc.reason}") from exc
+
+
+def _extract_qwen_task_id(response: dict) -> str:
+    output = response.get("output", {})
+    task_id = output.get("task_id")
+    if not task_id:
+        raise RuntimeError(f"Qwen API did not return a task_id: {response}")
+    return str(task_id)
+
+
+def _poll_qwen_task(task_id: str, *, api_key: str, max_attempts: int = 60, poll_interval: float = 2.0) -> dict:
+    task_url = QWEN_TASK_ENDPOINT.format(task_id=task_id)
+    for attempt in range(max_attempts):
+        response = _dashscope_post_json(task_url, api_key=api_key, payload=None)
+        output = response.get("output", {})
+        status = output.get("task_status")
+        if status in QWEN_TERMINAL_STATES:
+            if status != "SUCCEEDED":
+                message = output.get("message") or response.get("message") or f"task status={status}"
+                raise RuntimeError(f"Qwen image generation failed: {message}")
+            return response
+        if attempt < max_attempts - 1:
+            time.sleep(poll_interval)
+    raise RuntimeError(f"Qwen image generation timed out waiting for task {task_id}")
+
+
+def _extract_qwen_result_url(response: dict) -> str:
+    output = response.get("output", {})
+    results = output.get("results") or []
+    if not results:
+        raise RuntimeError(f"Qwen task completed without image results: {response}")
+    first_result = results[0]
+    result_url = first_result.get("url") or first_result.get("output_image_url")
+    if not result_url:
+        raise RuntimeError(f"Qwen task result did not contain an image URL: {response}")
+    return str(result_url)
+
+
+def _download_binary(url: str) -> bytes:
+    request = Request(url, method="GET")
+    try:
+        with urlopen(request, timeout=120) as response:
+            return response.read()
+    except HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Failed to download generated image with HTTP {exc.code}: {body}") from exc
+    except URLError as exc:
+        raise RuntimeError(f"Failed to download generated image: {exc.reason}") from exc

@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+import subprocess
 import shutil
 import uuid
 
@@ -33,7 +34,7 @@ def build_live_photo(
 ) -> LivePhotoArtifacts:
     """Create the output layout and build a Live Photo pair."""
     resolved_asset_id = asset_id or generate_asset_id()
-    paired_image = output_dir / f"livephoto{cover_image.suffix.lower()}"
+    paired_image = output_dir / f"livephoto{_paired_image_suffix(cover_image)}"
     paired_video = output_dir / f"livephoto{source_video.suffix.lower()}"
     artifacts = LivePhotoArtifacts(
         source_image=cover_image,
@@ -50,7 +51,7 @@ def build_live_photo(
 def write_live_photo_pair(artifacts: LivePhotoArtifacts) -> None:
     """Copy source assets, add Live Photo metadata, and create a Photos package."""
     artifacts.paired_image.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(artifacts.source_image, artifacts.paired_image)
+    _copy_or_convert_cover_image(artifacts.source_image, artifacts.paired_image)
     shutil.copy2(artifacts.source_video, artifacts.paired_video)
     makelive.make_live_photo(artifacts.paired_image, artifacts.paired_video, asset_id=artifacts.asset_id)
     makelive.save_live_photo_pair_as_pvt(
@@ -134,3 +135,31 @@ def extract_live_photo_pair(live_photo_path: Path) -> LivePhotoArtifacts:
         paired_video=video_path,
         pvt_package=parent / "livephoto.pvt",
     )
+
+
+def _paired_image_suffix(source_image: Path) -> str:
+    suffix = source_image.suffix.lower()
+    if suffix == ".png":
+        return ".jpg"
+    return suffix
+
+
+def _copy_or_convert_cover_image(source_image: Path, target_image: Path) -> None:
+    if source_image.suffix.lower() == ".png":
+        _convert_png_to_jpeg(source_image, target_image)
+        return
+    shutil.copy2(source_image, target_image)
+
+
+def _convert_png_to_jpeg(source_image: Path, target_image: Path) -> None:
+    if shutil.which("sips") is None:
+        raise RuntimeError("PNG cover conversion requires the macOS 'sips' command.")
+    try:
+        subprocess.run(
+            ["sips", "-s", "format", "jpeg", str(source_image), "--out", str(target_image)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(f"Failed to convert PNG cover to JPEG: {exc.stderr.strip()}") from exc

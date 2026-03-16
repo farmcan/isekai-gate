@@ -206,3 +206,33 @@ class CliTests(unittest.TestCase):
             call_args = build_mock.call_args
             self.assertEqual(call_args.kwargs.get("asset_id"), "original-asset-id")
         self.assertEqual(exit_code, 0)
+
+    def test_main_ai_cover_reports_generated_output_on_success(self) -> None:
+        with TemporaryDirectory() as tmpdir:
+            input_file = Path(tmpdir) / "photo.jpg"
+            output_file = Path(tmpdir) / "generated.png"
+            input_file.write_bytes(b"fake image")
+            stdout = StringIO()
+
+            with patch("isekai_live.cli.ensure_dependencies"):
+                with patch("isekai_live.cli.generate_cover", return_value=output_file):
+                    exit_code = main(
+                        [
+                            "ai-cover",
+                            "--input",
+                            str(input_file),
+                            "--prompt",
+                            "cartoon portrait",
+                            "--provider",
+                            "qwen",
+                            "--output",
+                            str(output_file),
+                            "--qwen-key",
+                            "sk-test",
+                        ],
+                        stdout=stdout,
+                    )
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("Generated AI cover", stdout.getvalue())
+        self.assertIn("Provider: qwen", stdout.getvalue())

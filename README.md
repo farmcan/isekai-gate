@@ -1,534 +1,181 @@
-# 🎭 isekai-live
+# isekai-live
 
-> **让一张静态封面，藏住另一段会动的真相。**
->
-> 用你指定的图片做封面，用你指定的视频做动态内容，一条命令生成 **iPhone 可识别的 Live Photo 资产对**。
+[中文说明](./README.zh-CN.md)
 
-<p align="center">
-  AI 图在外，真人视频在内。<br />
-  预览像海报，长按才揭晓。
-</p>
+Build, extract, remix, and import Live Photo-compatible assets from a chosen cover image and video.
 
-<p align="center">
-  <a href="#-60-秒上手">🚀 快速开始</a> ·
-  <a href="#你可以拿它做什么">🎨 创意灵感</a> ·
-  <a href="#它和常见做法有什么不同">📊 对比</a> ·
-  <a href="#常见问题">❓ FAQ</a>
-</p>
+`isekai-live` is a small CLI for creator-oriented Live Photo workflows:
 
----
+- use a custom still image as the cover
+- pair it with a chosen video
+- extract and remix existing Live Photos
+- generate a stylized cover with AI and package it back into a Live Photo
 
-## 为什么这个项目会让人想立刻试一下？
+It is not a full editor. It focuses on asset pairing, packaging, and repeatable CLI workflows.
 
-大多数 Live Photo 工具解决的是「怎么做出一张会动的照片」。
+## Why This Project
 
-**isekai-live** 解决的是另一件更有传播感的事：
+Most Live Photo tooling either focuses on capture or on low-level metadata writing.
 
-| 你看到的 | 实际播放的 | 传播效果 |
-|----------|------------|----------|
-| 📸 一张静态封面图 | ▶️ 长按后播放视频 | "封面骗人！" |
-| 🎨 AI 生成的动漫形象 | 🎬 真人自拍视频 | "我变成二次元了！" |
-| 🖼️ 精致的海报感照片 | 😂 搞怪日常片段 | "反差萌！" |
+This project packages that into a clearer workflow:
 
-这意味着你可以把：
+- `build`: create a Live Photo pair from image + video
+- `extract`: pull cover + video from an existing pair
+- `remix`: replace one side and rebuild
+- `ai-cover`: generate a new cover image from an existing one
 
-- **AI 生成图** + **真人自拍视频** → 朋友圈点赞收割机
-- **插画封面** + **现场片段** → 小红书爆款素材
-- **修复老照片** + **家庭祝福视频** → 长辈看了都感动
-- **拟人宠物图** + **宠物日常片段** → 毛孩子"成精"了
+The value is not "inventing Live Photo from scratch". The value is making the workflow explicit, scriptable, and easy to iterate on.
 
-**一句话说完：**
+## Status
 
-> **它不是修图工具，也不是视频剪辑器。它是一个把"反差感"打包进 Live Photo 的命令行工具。**
+- `build`, `extract`, `remix`: implemented
+- `ai-cover --provider qwen`: implemented
+- `ai-cover --provider gemini`: CLI reserved, API integration not implemented yet
+- `png` covers are accepted; `build` and `remix` convert them to `jpeg` automatically when needed
 
----
+## Requirements
 
-## 你可以拿它做什么？
+- Python `>= 3.14`
+- macOS recommended
+- `pip install -e .`
+- for Qwen AI cover generation: a DashScope API key (`sk-...`)
 
-### 🎭 1. AI 变身照
-
-| 封面 | 长按后 |
-|------|--------|
-| ![AI 动漫形象](https://via.placeholder.com/300x400?text=AI+Anime) | ![真人视频](https://via.placeholder.com/300x400?text=Real+Video) |
-| AI 生成的动漫形象 | 你的真人自拍视频 |
-
-**效果：** "我变成二次元了！"
-
-### 🎪 2. 反差感内容
-
-| 封面 | 长按后 |
-|------|--------|
-| ![精致海报](https://via.placeholder.com/300x400?text=Poster) | ![搞怪日常](https://via.placeholder.com/300x400?text=Daily+Life) |
-| 精致海报感照片 | 搞怪日常片段 |
-
-**效果：** "封面高冷，点开沙雕"
-
-### 📸 3. 回忆杀
-
-| 封面 | 长按后 |
-|------|--------|
-| ![修复老照片](https://via.placeholder.com/300x400?text=Old+Photo) | ![家人祝福](https://via.placeholder.com/300x400?text=Family+Video) |
-| AI 修复的老照片 | 家人说话的视频 |
-
-**效果：** 长辈看了都感动
-
-### 🐱 4. 宠物整活
-
-| 封面 | 长按后 |
-|------|--------|
-| ![宠物拟人](https://via.placeholder.com/300x400?text=Pet+Anime) | ![宠物日常](https://via.placeholder.com/300x400?text=Pet+Video) |
-| 宠物拟人插画 | 宠物真实动态 |
-
-**效果：** "毛孩子成精了！"
-
----
-
-## 它和常见做法有什么不同？
-
-| 方案 | 能生成 Live Photo | 能指定封面图 | 能指定动态视频 | 能导出可导入资产 | 操作成本 |
-|------|:---:|:---:|:---:|:---:|:---:|
-| iPhone 直接拍摄 | ✅ | ❌ | ❌ | ✅ | 低 |
-| 相册/快捷指令拼装 | ⚠️ 看方案 | ⚠️ | ⚠️ | ⚠️ | 中 |
-| 手动折腾元数据 | ✅ | ✅ | ✅ | ⚠️ | 高 |
-| **isekai-live** | **✅** | **✅** | **✅** | **✅** | **低** |
-
-**核心价值不是"能做 Live Photo"。**
-
-而是：
-
-- ✅ **封面和动态内容可以解耦** — 随便搭配
-- ✅ **输出结果清晰可控** — 知道每个文件是什么
-- ✅ **流程足够短** — 适合反复试素材
-- ✅ **可脚本化** — 能接入自动化工作流
-
----
-
-## 🚀 60 秒上手
-
-### 1️⃣ 安装
+## Install
 
 ```bash
-# 克隆项目
 git clone https://github.com/farmcan/isekai-gate.git
 cd isekai-gate
-
-# 安装依赖
 pip install -e .
 ```
 
-> **要求：** Python `>= 3.14` + macOS（推荐）
+## Quick Start
 
-### 2️⃣ 准备素材
-
-你只需要两份输入：
+Prepare:
 
 ```text
 assets/
-├── cover.jpg      # 封面图 (jpg/png/heic)
-└── clip.mov       # 视频 (mov/mp4)
+├── cover.jpg
+└── clip.mov
 ```
 
-**建议：**
-- 📐 封面和视频尺寸匹配（推荐 1080x1920 竖屏）
-- ⏱️ 视频时长 3-5 秒最佳
-
-### 3️⃣ 一条命令生成
+Build a Live Photo package:
 
 ```bash
-isekai-live \
+isekai-live build \
   --cover assets/cover.jpg \
   --video assets/clip.mov \
   --output-dir output
 ```
 
-成功后会输出：
+Typical output:
 
 ```text
-✅ Image: output/livephoto.jpg
-✅ Video: output/livephoto.mov
-✅ Package: output/livephoto.pvt
-✅ Asset ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Image: output/livephoto.jpg
+Video: output/livephoto.mov
+Package: output/livephoto.pvt
+Asset ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-### 4️⃣ 导入到照片
-
-在 macOS 上可直接打开 `.pvt` 包：
+Import into Photos on macOS:
 
 ```bash
 open output/livephoto.pvt
 ```
 
-然后通过照片 App 同步到 iPhone，发朋友圈！
+## Examples
 
----
-
-## 🔄 提取和 Remix
-
-有了 `extract` 和 `remix`，你可以对现有的 Live Photo 进行素材提取和重新混音。
-
-### 📤 提取素材
-
-从已有的 Live Photo 中分离出封面图和视频：
+Extract a Live Photo pair:
 
 ```bash
 isekai-live extract --input livephoto.jpg --output-dir extracted/
 ```
 
-**输出：**
-```text
-extracted/
-├── cover.jpg   # 提取的封面图
-└── video.mov   # 提取的视频
-```
-
-### 🎛️ Remix 重新混音
-
-替换封面或视频，生成新的 Live Photo：
+Remix with a new cover:
 
 ```bash
-# 只替换封面
-isekai-live remix --input livephoto.jpg --new-cover ai_cover.jpg --output-dir remixed/
-
-# 只替换视频
-isekai-live remix --input livephoto.jpg --new-video new_clip.mov --output-dir remixed/
-
-# 封面和视频都替换
-isekai-live remix --input livephoto.jpg --new-cover new.jpg --new-video new.mov --output-dir remixed/
-
-# 保持原有资源 ID（适合覆盖更新）
-isekai-live remix --input livephoto.jpg --new-cover new.jpg --keep-asset-id --output-dir remixed/
-```
-
-### 💡 使用场景
-
-| 工作流 | 说明 |
-|--------|------|
-| 🎨 AI 封面 + 原视频 → 新 Live Photo | 用 AI 生成新封面，保留原视频 |
-| 🎬 原封面 + 新视频 → 新 Live Photo | 保留封面，替换动态内容 |
-| 🔄 提取现有 Live Photo 素材 → 重新混音 | 先 extract 分离，再 remix 重组 |
-
-**示例：AI 变身照迭代**
-```bash
-# 1. 提取原始素材
-isekai-live extract --input original.jpg --output-dir assets/
-
-# 2. 用 AI 生成新封面（外部工具）
-# ai-tool generate --prompt "anime style" --input assets/cover.jpg --output ai_cover.jpg
-
-# 3. 用新封面 remix
-isekai-live remix --input original.jpg --new-cover ai_cover.jpg --output-dir final/
-```
-
----
-
-## 🤖 AI 封面生成
-
-使用 AI 图像生成 API，一键将现有封面转换为不同艺术风格！
-
-### 🎨 支持的 AI 提供商
-
-| 提供商 | API | 功能 |
-|--------|-----|------|
-| **Qwen (通义千问)** | 阿里云 DashScope | 图生图、风格转换 |
-| **Gemini** | Google Generative AI | 图生图、风格转换 |
-
-### 🚀 快速开始
-
-```bash
-# 使用 Qwen 生成动漫风格封面
-isekai-live ai-cover \
-  --input livephoto.jpg \
-  --prompt "anime style portrait" \
-  --provider qwen \
-  --output ai_cover.jpg
-
-# 使用 Gemini 生成油画风格封面
-isekai-live ai-cover \
-  --input livephoto.jpg \
-  --prompt "oil painting style" \
-  --provider gemini \
-  --output ai_cover.jpg
-```
-
-### 🔑 API Key 配置
-
-可以通过两种方式提供 API Key：
-
-**方式 1：命令行参数**
-```bash
-isekai-live ai-cover --input livephoto.jpg --prompt "anime style" \
-  --provider qwen --qwen-key YOUR_QWEN_API_KEY --output ai_cover.jpg
-```
-
-**方式 2：环境变量**
-```bash
-export QWEN_API_KEY=your_qwen_api_key
-export GEMINI_API_KEY=your_gemini_api_key
-
-isekai-live ai-cover --input livephoto.jpg --prompt "anime style" \
-  --provider qwen --output ai_cover.jpg
-```
-
-### 🎭 常用风格提示词
-
-| 风格 | 提示词示例 |
-|------|-----------|
-| 动漫风格 | `anime style portrait`, `manga illustration`, `Studio Ghibli style` |
-| 油画 | `oil painting`, `classical portrait`, `impasto style` |
-| 水彩画 | `watercolor painting`, `soft watercolor style` |
-| 像素艺术 | `pixel art`, `8-bit style`, `retro game art` |
-| 赛博朋克 | `cyberpunk style`, `neon lights`, `futuristic` |
-| 素描 | `pencil sketch`, `black and white drawing` |
-| 3D 渲染 | `3D render`, `CGI`, `Pixar style` |
-
-### 🔄 完整工作流
-
-```bash
-# 1. 从现有 Live Photo 提取封面
-isekai-live extract --input original.jpg --output-dir assets/
-
-# 2. 用 AI 生成新风格封面
-isekai-live ai-cover \
-  --input assets/cover.jpg \
-  --prompt "anime style portrait, vibrant colors" \
-  --provider qwen \
-  --output ai_cover.jpg
-
-# 3. 用新封面 Remix Live Photo
 isekai-live remix \
   --input original.jpg \
-  --new-cover ai_cover.jpg \
+  --new-cover new_cover.jpg \
+  --output-dir remixed/
+```
+
+Generate a Qwen stylized cover:
+
+```bash
+isekai-live ai-cover \
+  --input assets/cover.jpg \
+  --prompt "Turn this photo into a clean cartoon illustration while keeping the original subject and composition." \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output ai_cover.png
+```
+
+End-to-end AI cover workflow:
+
+```bash
+isekai-live extract --input original.jpg --output-dir assets/
+
+isekai-live ai-cover \
+  --input assets/cover.jpg \
+  --prompt "Turn this photo into a clean cartoon illustration while keeping the original subject and composition. Bright colors, simple background, suitable for a Live Photo cover." \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output ai_cover.png
+
+isekai-live remix \
+  --input original.jpg \
+  --new-cover ai_cover.png \
   --output-dir remixed/
 
-# 4. 导入 Photos 预览
 open remixed/livephoto.pvt
 ```
 
-### ⚙️ 实现说明
+## How To Validate
 
-当前版本的 AI 封面生成功能提供了**骨架代码**，用户需要根据自己的 API 订阅实现具体的 API 调用。
+Validation has two layers:
 
-**需要实现的 API：**
-- **Qwen**: 阿里云 DashScope API (wanx-v1 模型)
-- **Gemini**: Google Generative AI API
+1. Asset-level validation
+- confirm `livephoto.jpg`, `livephoto.mov`, and `livephoto.pvt` are generated
+- confirm the image and video are paired as one Live Photo asset
+- confirm `extract` can recover the pair
 
-详见源代码：`src/isekai_live/ai_cover.py`
+2. Photos-level validation
+- import the `.pvt` package into macOS Photos
+- verify Photos recognizes it as a Live Photo
+- verify press-and-hold / playback behaves correctly
 
----
+Why this matters: file generation alone does not prove Apple Photos will accept the result as a real Live Photo. The final acceptance test is Photos import and playback behavior.
 
-## 📋 命令说明
+## AI Cover Notes
 
-### 基本格式
+- Qwen uses Alibaba DashScope image-to-image generation
+- pass the key with `--qwen-key`, or set `QWEN_API_KEY`
+- the generated output is written to `--output`
+- if that output is `png`, later `build` / `remix` converts it to `jpeg` automatically for Live Photo packaging
 
-```bash
-isekai-live --cover <image> --video <video> --output-dir <dir>
-```
-
-### 参数表
-
-| 参数 | 必填 | 说明 |
-|------|------|------|
-| `--cover` | ✅ | 封面图片路径 (jpg/png/heic) |
-| `--video` | ✅ | 源视频路径 (mov/mp4) |
-| `--output-dir` | ✅ | 输出目录 |
-
-### 🎨 示例
+## Official Sample Files
 
 ```bash
-# AI 图做封面，自拍视频做动态内容
-isekai-live --cover ./samples/anime.jpg --video ./samples/self.mov --output-dir ./output
-
-# 修复老照片做封面，家人祝福视频做动态内容
-isekai-live --cover ./samples/family.jpg --video ./samples/blessing.mov --output-dir ./output
-
-# 宠物插画做封面，宠物视频做动态内容
-isekai-live --cover ./samples/cat.png --video ./samples/cat.mov --output-dir ./output
-```
-
----
-
-## 🏗️ 结构很简单，但很对
-
-`isekai-live` 的价值，不在于复杂。
-
-恰恰在于它把 Live Photo 生成这件事，收敛成了一个非常短的路径：
-
-```mermaid
-flowchart LR
-    A[📷 封面图] --> C[isekai-live]
-    B[🎬 源视频] --> C
-    C --> D[复制到输出目录]
-    D --> E[写入同一组 Live Photo 元数据]
-    E --> F[📄 配对图片]
-    E --> G[🎞️ 配对视频]
-    E --> H[📦 .pvt 导入包]
-    F --> I[iPhone / Photos 可识别]
-    G --> I
-    H --> I
-```
-
-这套流程的重点是：
-
-- ✅ **输入简单** — 一图一视频
-- ✅ **处理直接** — 复制、配对、写元数据
-- ✅ **输出明确** — 你能看到每个产物是什么
-- ✅ **接入轻量** — 命令行即可集成到自己的工作流
-
----
-
-## 🛡️ 为什么它可靠？
-
-底层依赖 [`makelive`](https://github.com/RhetTbull/makelive) 来写入 Live Photo 所需元数据。
-
-项目做的事情很克制：
-
-```python
-# 1. 生成一个唯一 asset_id
-asset_id = str(uuid.uuid4())
-
-# 2. 把图片和视频复制到输出目录
-shutil.copy(cover, output_dir / "livephoto.jpg")
-shutil.copy(video, output_dir / "livephoto.mov")
-
-# 3. 为两者写入同一组 Live Photo 标识
-makelive(image_path, asset_id)
-makelive(video_path, asset_id)
-
-# 4. 导出 .pvt 包用于照片导入
-save_live_photo_pair_as_pvt(...)
-```
-
-也就是说，它不是"伪装成 Live Photo"。
-
-它做的是一组 **Apple 生态能识别的配对资产**。
-
----
-
-## ❓ 常见问题
-
-### Q: 为什么它看起来像"封面骗人"？
-
-A: 因为 Live Photo 在很多场景下先展示静态封面，用户长按之后才播放动态内容。
-`isekai-live` 允许你主动指定这个封面，而不是被动接受视频中的某一帧。
-
-**这就是"惊喜"的来源！** 😉
-
-### Q: 适合什么视频长度？
-
-A: 短视频更自然。通常建议 **3-5 秒**，能更接近 Live Photo 的使用体验。
-
-### Q: 一定要在 macOS 上用吗？
-
-A: 命令本身是 Python CLI，跨平台。
-但 `.pvt` 导入包和后续导入照片的体验，**macOS + Photos** 会更顺滑。
-
-### Q: 它是编辑器吗？
-
-A: 不是。
-它不负责剪视频、抠图、生成 AI 图，它只负责把你已经准备好的素材组装成 Live Photo 资产。
-
-**简单说：你准备素材，它负责配对。**
-
-### Q: 能不能批量处理？
-
-A: 当前版本支持单次生成。
-如果你要批量化，可以直接在 shell 脚本或 Python 脚本里循环调用 CLI：
-
-```bash
-for cover in covers/*.jpg; do
-  isekai-live --cover $cover --video video.mov --output-dir output/$(basename $cover)
-done
-```
-
-### Q: 发朋友圈会被发现吗？
-
-A: 放心！在朋友圈预览里显示的是封面图，只有点开大图长按才会播放动态内容。
-
-**这就是"表里不一"的魅力！** 🎭
-
----
-
-## 🎯 项目定位
-
-### ❌ 如果你想要的是：
-
-- 一个 GUI 修图软件
-- 一个带模板市场的内容平台
-- 一个自动生成 AI 封面的视频工作站
-
-那这个项目不是那个方向。
-
-### ✅ 如果你想要的是：
-
-> **"给我一张图，一个视频，一条命令，把它们变成 Live Photo。"**
-
-那它就是。
-
----
-
-## 📦 输出文件说明
-
-```text
-output/
-├── livephoto.jpg      # 配对后的封面图（后缀随输入变化）
-├── livephoto.mov      # 配对后的视频（后缀随输入变化）
-└── livephoto.pvt      # macOS Photos 导入包
-```
-
-**验证配对：**
-
-```python
-from pathlib import Path
-from makelive import live_id, is_live_photo_pair
-
-image = Path("output/livephoto.jpg")
-video = Path("output/livephoto.mov")
-
-print(f"图片 ID: {live_id(image)}")
-print(f"视频 ID: {live_id(video)}")
-print(f"配对成功：{is_live_photo_pair(image, video)}")
-```
-
-三项结果一致 = 配对成功 ✅
-
----
-
-## 🙏 致谢
-
-- [`makelive`](https://github.com/RhetTbull/makelive) — 提供 Live Photo 元数据写入能力
-
----
-
-## 🧪 测试
-
-想快速体验但不想准备素材？直接用 `makelive` 项目的官方测试文件：
-
-```bash
-# 下载官方测试文件（约 9MB）
 curl -LO https://raw.githubusercontent.com/RhetTbull/makelive/main/tests/test.jpeg
 curl -LO https://raw.githubusercontent.com/RhetTbull/makelive/main/tests/test.mov
 
-# 生成 Live Photo
 isekai-live build --cover test.jpeg --video test.mov --output-dir output
-
-# 导入 Photos 预览
 open output/livephoto.pvt
 ```
 
-**测试文件来源：** [makelive/tests](https://github.com/RhetTbull/makelive/tree/main/tests)
+Source: [`makelive/tests`](https://github.com/RhetTbull/makelive/tree/main/tests)
 
----
+## Implementation Notes
 
-## 📄 License
+This project relies on [`makelive`](https://github.com/RhetTbull/makelive) for Live Photo metadata writing and `.pvt` packaging.
 
-MIT License — 随便用，记得 star 就好 ⭐
+That dependency should be explicit. The contribution here is the workflow glue around it:
 
----
+- clear CLI entrypoints
+- reproducible outputs
+- extract / remix loop
+- AI cover generation feeding back into Live Photo packaging
 
-<p align="center">
-  <strong>Made with 🎭 for creative humans</strong>
-</p>
+## License
 
-<p align="center">
-  有问题？提 Issue | 有创意？分享你的作品！
-</p>
+MIT
