@@ -201,8 +201,20 @@ Why this matters: a command finishing successfully does not prove Apple Photos w
 curl -LO https://raw.githubusercontent.com/RhetTbull/makelive/main/tests/test.jpeg
 curl -LO https://raw.githubusercontent.com/RhetTbull/makelive/main/tests/test.mov
 
+# basic build
 isekai-live build --cover test.jpeg --video test.mov --output-dir output
 open output/livephoto.pvt
+
+# original cover + stylized video
+isekai-live ai-video \
+  --input-video test.mov \
+  --style anime \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output stylized.mp4
+
+isekai-live build --cover test.jpeg --video stylized.mp4 --output-dir output-ai-video
+open output-ai-video/livephoto.pvt
 ```
 
 Source: [`makelive/tests`](https://github.com/RhetTbull/makelive/tree/main/tests)

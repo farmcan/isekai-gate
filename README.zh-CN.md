@@ -201,8 +201,20 @@ open output/livephoto.pvt
 curl -LO https://raw.githubusercontent.com/RhetTbull/makelive/main/tests/test.jpeg
 curl -LO https://raw.githubusercontent.com/RhetTbull/makelive/main/tests/test.mov
 
+# 最基础的构建（风格化图片 + 原视频）
 isekai-live build --cover test.jpeg --video test.mov --output-dir output
 open output/livephoto.pvt
+
+# 原图封面 + 风格化视频
+isekai-live ai-video \
+  --input-video test.mov \
+  --style anime \
+  --provider qwen \
+  --qwen-key YOUR_DASHSCOPE_API_KEY \
+  --output stylized.mp4
+
+isekai-live build --cover test.jpeg --video stylized.mp4 --output-dir output-ai-video
+open output-ai-video/livephoto.pvt
 ```
 
 来源：[`makelive/tests`](https://github.com/RhetTbull/makelive/tree/main/tests)
