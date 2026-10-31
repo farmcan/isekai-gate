@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-31",
+  "selection_note": "可公开复用的功能演示素材，不是实时热榜。",
+  "items": [
+    {
+      "id": "open-cat",
+      "title": "路过镜头的小黑猫",
+      "subtitle": "CC0 公开示例 · 先试试长按",
+      "cover": "open-cat.jpg",
+      "video": "open-cat.mp4",
+      "source_record": "open-cat-source.json"
+    },
+    {
+      "id": "open-cat-detail",
+      "title": "只留走近的 1.5 秒",
+      "subtitle": "同一片段，换一种留法",
+      "cover": "open-cat-detail.jpg",
+      "video": "open-cat.mp4",
+      "start": 2,
+      "length": 1.5,
+      "coverTime": 2.3,
+      "source_record": "open-cat-source.json"
+    }
+  ]
+}

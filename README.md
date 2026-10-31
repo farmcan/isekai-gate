@@ -46,11 +46,15 @@ The result is not just "a moving photo". It is a deliberately designed preview-t
 
 ## Browser studio (2026-10-31)
 
-The first browser studio is hosted at <https://farmcan.pages.dev/isekai-live/> under the existing Farmcan sign-in gate. `web/` provides local video trimming, frame/custom covers, aspect-ratio crops, press-and-hold preview, MP4/JPG downloads, Mac Photos `.pvt` ZIP packages, and a 3:4 social cover plus editable post copy. Media stays in the browser; there is no automatic social posting or paid AI call.
+Independent product: <https://isekai-live.pages.dev/>. The owner explicitly selected public access for this site; the private Farmcan directory only links outward. The former directory subpath is a protected migration redirect.
 
-Browser-exported pairs have been decoded by Apple's `PHLivePhoto` API. Personal Photos-library import, iPhone save/wallpaper behavior, and native Xiaohongshu Live Photo upload remain separate device checks. Examples are historical cat memes, not a current popularity ranking; provenance and usage boundaries are retained in `web/media/sources.json`.
+`web/` is a local browser editor with a draggable thumbnail timeline, clip/cover/share inspectors, press-and-hold preview, and goal-based exports (Mac Live Photo ZIP, MP4, frame JPG, or 3:4 social cover). Mobile has immediate file selection and a sticky export action. Media is never uploaded; there is no automatic social posting or paid AI call.
 
-Export only the reviewed bundle with `python3 scripts/export_web.py --target <farmcan checkout>/site/isekai-live`. The lazily loaded engine is about 32 MB. Third-party component versions and licenses are in `web/vendor/THIRD-PARTY.txt`; FFmpeg core is independently distributed under GPL-2.0-or-later.
+The public demo is an excerpt of Dzkouslavia's CC0 “Black Cat walking” from Wikimedia Commons. Provenance and hashes are in `web/media/open-cat-source.json`; legacy meme experiments are excluded from the independent release.
+
+Build `dist/standalone/` with `python3 scripts/build_web.py`; deploy to the existing `isekai-live` Cloudflare Pages project using production branch `dev`. `python3 scripts/verify_web.py` verifies actual production bytes. The approximately 32 MB FFmpeg engine is loaded lazily; licenses are in `web/vendor/THIRD-PARTY.txt`.
+
+Apple PHLivePhoto resource decoding is verified. Personal Photos-library import, iPhone save/wallpaper behavior, and native Xiaohongshu Live Photo upload remain separate device checks.
 
 ## Status
 

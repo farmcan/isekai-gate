@@ -3,11 +3,11 @@ import {pairedJpeg, packagePlist} from './live-pair.js';
 const $ = id => document.getElementById(id);
 const video = $('video');
 const preview = $('preview');
-const state = {source: null, sourceUrl: null, sourceName: '', start: 0, length: 3, duration: 0, coverTime: 0, coverBlob: null, customCover: null, coverUrl: null, busy: false, playing: false, ready: false, revision: 0};
+const state = {source: null, sourceUrl: null, sourceName: '', start: 0, length: 3, duration: 0, coverTime: 0, coverBlob: null, customCover: null, coverUrl: null, busy: false, playing: false, ready: false, revision: 0, sourceToken: 0, exportKind: 'live'};
 let engine = null, loadingEngine = null, loadController = null, playingTimer = null, captureRevision = 0;
 const downloadUrls = new Set();
 const text = (id, value) => $(id).textContent = value;
-const status = (message, error = false) => { text('status', message); $('status').classList.toggle('error', error); };
+const status = (message, error = false) => { text('status', message); $('status').classList.toggle('error', error); text('exportStatus', message); $('exportStatus').classList.toggle('error', error); };
 const seconds = n => `${n.toFixed(1)} s`;
 const clock = n => `${Math.floor(n / 60)}:${String(Math.floor(n % 60)).padStart(2, '0')}`;
 const blobOf = (canvas, type = 'image/jpeg', quality = .94) => new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('图片导出失败')), type, quality));
@@ -26,22 +26,22 @@ function cropDraw(ctx, image, x, y, w, h) {
   ctx.drawImage(image, (iw - sw) / 2, (ih - sh) / 2, sw, sh, x, y, w, h);
 }
 
-async function seek(time) {
+async function seek(time, element = video) {
   await new Promise((resolve, reject) => {
-    const cleanup = () => { clearTimeout(timer); video.removeEventListener('seeked', done); };
+    const cleanup = () => { clearTimeout(timer); element.removeEventListener('seeked', done); };
     const done = () => { cleanup(); resolve(); };
     const timer = setTimeout(() => { cleanup(); reject(new Error('视频定位超时，请换一个 MP4 片段')); }, 12000);
-    video.addEventListener('seeked', done, {once: true});
-    const target = Math.min(time, Math.max(0, video.duration - .04));
-    video.currentTime = Math.abs(video.currentTime - target) < .001 ? Math.min(target + .01, video.duration - .02) : target;
+    element.addEventListener('seeked', done, {once: true});
+    const target = Math.min(time, Math.max(0, element.duration - .04));
+    element.currentTime = Math.abs(element.currentTime - target) < .001 ? Math.min(target + .01, element.duration - .02) : target;
   });
   // A loaded/seeked frame can precede the composited frame on WebKit. Waiting
   // for presentation avoids black canvas covers on the initial paused frame.
   await new Promise(resolve => {
     let callback;
-    const done = () => { clearTimeout(timer); if (callback) video.cancelVideoFrameCallback(callback); resolve(); };
+    const done = () => { clearTimeout(timer); if (callback) element.cancelVideoFrameCallback(callback); resolve(); };
     const timer = setTimeout(done, 180);
-    if (video.requestVideoFrameCallback) callback = video.requestVideoFrameCallback(done);
+    if (element.requestVideoFrameCallback) callback = element.requestVideoFrameCallback(done);
     else requestAnimationFrame(() => requestAnimationFrame(done));
   });
 }
@@ -66,6 +66,7 @@ async function captureCover() {
   state.coverBlob = blob; state.coverUrl = URL.createObjectURL(blob);
   $('cover').src = state.coverUrl; $('cover').hidden = false;
   preview.style.aspectRatio = `${width}/${height}`;
+  preview.style.width = `min(100%, ${Math.min(500, 330 * width / height)}px)`;
   text('coverLabel', state.customCover ? '自选图片封面 → 长按播放' : '视频帧封面 → 长按播放');
 }
 
@@ -87,17 +88,26 @@ function update() {
   $('coverTime').value = state.coverTime;
   text('startLabel', seconds(state.start)); text('coverTimeLabel', seconds(state.coverTime));
   text('durationLabel', state.ready ? `${(end - state.start).toFixed(1)} 秒` : '—');
-  text('timelineStart', clock(state.start)); text('timelineEnd', clock(end));
+  text('timelineStart', clock(0)); text('timelineMiddle', clock(state.duration / 2)); text('timelineEnd', clock(state.duration));
+  text('endLabel', seconds(end)); text('lengthLabel', state.ready ? seconds(end - state.start) : '—');
   text('clipBadge', state.ready ? `${seconds(state.start)} — ${seconds(end)}` : '先选一个视频');
   text('exportSummary', state.ready ? `${(end - state.start).toFixed(1)} 秒 · ${dimensions().width} × ${dimensions().height}` : '选好素材就可以导出');
-  for (const id of ['start', 'coverTime', 'capture', 'playToggle', 'exportLive', 'exportVideo', 'exportCover', 'exportPoster', 'copyPost']) $(id).disabled = !ready;
+  text('mobileSummary', state.ready ? `${(end - state.start).toFixed(1)} 秒 · ${dimensions().width} × ${dimensions().height}` : '选择一个视频开始');
+  for (const id of ['start', 'coverTime', 'capture', 'playToggle', 'exportLive', 'exportVideo', 'exportCover', 'exportPoster', 'copyPost', 'openExport', 'openExportMobile', 'exportNow', 'soundToggle']) $(id).disabled = !ready;
+  if (state.ready) {
+    $('selectionWindow').hidden = false; $('coverMarker').hidden = false;
+    $('selectionWindow').style.left = `${100 * state.start / state.duration}%`;
+    $('selectionWindow').style.width = `${100 * (end - state.start) / state.duration}%`;
+    $('coverMarker').style.left = `${100 * state.coverTime / state.duration}%`;
+  } else { $('selectionWindow').hidden = true; $('coverMarker').hidden = true; }
   preview.disabled = !ready;
-  for (const id of ['file', 'coverFile', 'ratio']) $(id).disabled = state.busy;
-  document.querySelectorAll('[data-duration], .sample').forEach(b => b.disabled = state.busy);
+  for (const id of ['file', 'coverFile', 'ratio', 'quickImport']) $(id).disabled = state.busy;
+  document.querySelectorAll('[data-duration], .sample, .filmstrip button').forEach(b => b.disabled = state.busy);
 }
 
 async function loadSource(source, name, sampleId = null) {
   if (state.busy) return;
+  const token = ++state.sourceToken; ++captureRevision;
   stopPlaying(); state.ready = false; state.customCover = null; state.coverBlob = null; invalidate(); update();
   if (state.sourceUrl) URL.revokeObjectURL(state.sourceUrl);
   state.source = source; state.sourceName = name;
@@ -112,12 +122,17 @@ async function loadSource(source, name, sampleId = null) {
     video.addEventListener('loadeddata', done, {once: true}); video.addEventListener('error', fail, {once: true});
     video.load();
   });
+  if (token !== state.sourceToken) return false;
   if (!Number.isFinite(video.duration) || video.duration < .25 || video.duration > 180) throw new Error('请选择 0.25 秒至 3 分钟的视频。');
   state.duration = video.duration; state.start = 0; state.coverTime = 0; state.ready = true;
   $('emptyPreview').hidden = true; $('holdHint').hidden = false;
   text('fileLabel', name);
   document.querySelectorAll('.sample').forEach(b => b.classList.toggle('active', b.dataset.id === sampleId));
-  update(); await captureCover(); status('封面已准备好。按住画面，看看这几秒。');
+  update(); await captureCover();
+  if (token !== state.sourceToken) return false;
+  status('封面已准备好。按住画面，看看这几秒。');
+  generateFilmstrip(token).catch(() => { if (token === state.sourceToken) text('timelineHint', '缩略帧暂不可用，可使用滑条选段'); });
+  return true;
 }
 
 async function play() {
@@ -128,13 +143,13 @@ async function play() {
     if (!state.playing) return;
     preview.classList.add('is-playing');
     await video.play();
-    text('playToggle', '停止预览 □');
+    text('playToggle', 'Ⅱ'); $('playToggle').setAttribute('aria-label', '停止预览');
     playingTimer = setTimeout(stopPlaying, Math.min(state.length, state.duration - state.start) * 1000 + 30);
   } catch (error) { stopPlaying(); status(error.message, true); }
 }
 function stopPlaying() {
   state.playing = false; video.pause(); clearTimeout(playingTimer);
-  preview.classList.remove('is-playing'); text('playToggle', '播放预览 ▷');
+  preview.classList.remove('is-playing'); text('playToggle', '▷'); $('playToggle').setAttribute('aria-label', '播放预览');
 }
 video.addEventListener('timeupdate', () => { if (state.playing && video.currentTime >= state.start + state.length) stopPlaying(); });
 video.addEventListener('ended', stopPlaying);
@@ -242,7 +257,7 @@ async function runExport(kind) {
     if (kind === 'live') {
       progress('正在打包封面和动态片段…', 99);
       const jpeg = pairedJpeg(new Uint8Array(await snapshot.cover.arrayBuffer()), id);
-      const manifest = {tool: 'isekai-live', version: '0.2.0', asset_id: id, duration_seconds: snapshot.duration, width: snapshot.width, height: snapshot.height, photos_validation: 'device_import_not_verified'};
+      const manifest = {tool: 'isekai-live', version: '0.3.0', asset_id: id, duration_seconds: snapshot.duration, width: snapshot.width, height: snapshot.height, photos_validation: 'device_import_not_verified'};
       const files = {
         'livephoto.pvt/livephoto.jpg': jpeg,
         'livephoto.pvt/livephoto.mov': motion,
@@ -262,10 +277,8 @@ async function runExport(kind) {
     state.busy = false; $('progress').hidden = true; update();
   }
 }
-$('exportLive').addEventListener('click', () => runExport('live'));
-$('exportVideo').addEventListener('click', () => runExport('video'));
 $('cancelExport').addEventListener('click', () => { terminateEngine(); status('已取消导出。'); });
-$('exportCover').addEventListener('click', safely(async () => { await captureCover(); download(state.coverBlob, 'isekai-live-cover.jpg', '封面 JPG'); status('封面已准备好。'); }));
+async function exportCover() { await captureCover(); download(state.coverBlob, 'isekai-live-cover.jpg', '封面 JPG'); status('封面已准备好。'); }
 
 function wrapText(ctx, value, maxWidth) {
   const rows = [''];
@@ -274,18 +287,18 @@ function wrapText(ctx, value, maxWidth) {
   }
   return rows.slice(0, 3);
 }
-$('exportPoster').addEventListener('click', safely(async () => {
+async function exportPoster() {
   await captureCover();
   const canvas = document.createElement('canvas'); canvas.width = 1080; canvas.height = 1440;
   const ctx = canvas.getContext('2d'), image = await createImageBitmap(state.coverBlob);
-  ctx.fillStyle = '#f5f4ee'; ctx.fillRect(0, 0, 1080, 1440);
+  ctx.fillStyle = '#f4f6fb'; ctx.fillRect(0, 0, 1080, 1440);
   cropDraw(ctx, image, 48, 48, 984, 1010); image.close();
-  ctx.fillStyle = '#25251f'; ctx.font = '600 58px sans-serif';
+  ctx.fillStyle = '#253449'; ctx.font = '600 58px sans-serif';
   const caption = $('caption').value.trim() || '喜欢的瞬间，值得再看一次';
   wrapText(ctx, caption, 920).forEach((line, i) => ctx.fillText(line, 64, 1160 + i * 76));
-  ctx.fillStyle = '#84906d'; ctx.font = '24px sans-serif'; ctx.fillText('isekai-live  /  留住喜欢的那几秒', 64, 1380);
+  ctx.fillStyle = '#8093ba'; ctx.font = '24px sans-serif'; ctx.fillText('isekai-live  /  留住喜欢的那几秒', 64, 1380);
   download(await blobOf(canvas), 'isekai-live-share-cover.jpg', '3:4 分享封面'); status('3:4 分享封面已准备好。');
-}));
+}
 $('copyPost').addEventListener('click', safely(async () => {
   const caption = $('caption').value.trim() || '喜欢的瞬间，值得再看一次';
   const content = `${caption}\n\n从视频里挑出最想循环的 ${Math.min(state.length, state.duration - state.start).toFixed(1)} 秒，再选一张喜欢的封面。\n用 isekai-live 留住这个瞬间。\n\n#生活碎片 #视频选段 #LivePhoto #实况图`;
@@ -294,7 +307,7 @@ $('copyPost').addEventListener('click', safely(async () => {
 }));
 
 async function loadSamples() {
-  const response = await fetch('./media/sources.json');
+  const response = await fetch('./media/public-sources.json');
   if (!response.ok) return;
   const payload = await response.json();
   const samples = payload.items || [];
@@ -302,17 +315,135 @@ async function loadSamples() {
     const button = document.createElement('button'); button.type = 'button'; button.className = 'sample'; button.dataset.id = sample.id;
     const img = document.createElement('img'); img.src = './media/' + sample.cover; img.alt = sample.title; img.loading = 'lazy';
     const title = document.createElement('strong'); title.textContent = sample.title;
-    const note = document.createElement('small'); note.textContent = sample.subtitle || '经典梗图 · 点击试做';
-    button.append(img, title, note);
+    const note = document.createElement('small'); note.textContent = sample.subtitle || '公开示例 · 点击试做';
+    const description = document.createElement('span'); description.className = 'sample-text'; description.append(title, note);
+    button.append(img, description);
     button.addEventListener('click', safely(async () => {
       const r = await fetch('./media/' + sample.video); if (!r.ok) throw new Error('示例暂时无法读取，请刷新后重试。');
-      await loadSource(await r.blob(), sample.video, sample.id);
+      if (!(await loadSource(await r.blob(), sample.video, sample.id))) return;
+      if (sample.start !== undefined) { state.start = sample.start; state.length = sample.length; state.coverTime = sample.coverTime ?? sample.start; update(); await captureCover(); }
+      $('studio').scrollIntoView({behavior: 'smooth', block: 'start'});
     }));
     $('samples').append(button);
   }
+  const own = document.createElement('button'); own.type = 'button'; own.className = 'sample sample-own';
+  own.innerHTML = '<span class="sample-plus">＋</span><span><strong>接下来，试试你的。</strong><small>选一段相册里的视频</small></span>';
+  own.addEventListener('click', () => $('file').click()); $('samples').append(own);
   if (samples[0]) {
     const sample = samples[0], r = await fetch('./media/' + sample.video);
     if (r.ok) await loadSource(await r.blob(), sample.video, sample.id);
   }
 }
+const thumbnailUrls = new Set();
+let rangeDrag = null;
+$('selectionWindow').addEventListener('pointerdown', e => {
+  if (!state.ready || state.busy || e.button !== 0) return;
+  e.preventDefault(); stopPlaying();
+  const selection = $('selectionWindow'); selection.setPointerCapture(e.pointerId);
+  const children = [...selection.children];
+  rangeDrag = {x: e.clientX, start: state.start, length: state.length,
+    mode: e.target === children[0] ? 'start' : e.target === children[1] ? 'end' : 'move'};
+});
+$('selectionWindow').addEventListener('pointermove', e => {
+  if (!rangeDrag) return;
+  const track = $('timelineTrack').getBoundingClientRect();
+  const delta = (e.clientX - rangeDrag.x) / track.width * state.duration;
+  const end = Math.min(state.duration, rangeDrag.start + rangeDrag.length);
+  if (rangeDrag.mode === 'start') {
+    state.start = Math.min(end - .5, Math.max(0, end - 5, rangeDrag.start + delta));
+    state.length = end - state.start;
+  } else if (rangeDrag.mode === 'end') {
+    state.length = Math.min(5, state.duration - state.start, Math.max(.5, rangeDrag.length + delta));
+  } else {
+    state.start = Math.max(0, Math.min(state.duration - rangeDrag.length, rangeDrag.start + delta));
+  }
+  update();
+});
+for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) $('selectionWindow').addEventListener(event, safely(async e => {
+  if (!rangeDrag) return;
+  const drag = rangeDrag; rangeDrag = null;
+  if (event === 'pointerup' && Math.abs(e.clientX - drag.x) < 3 && drag.mode === 'move') {
+    const track = $('timelineTrack').getBoundingClientRect();
+    state.coverTime = (e.clientX - track.left) / track.width * state.duration;
+    state.customCover = null;
+  }
+  document.querySelectorAll('[data-duration]').forEach(item => item.classList.toggle('selected', Math.abs(Number(item.dataset.duration) - state.length) < .01));
+  invalidate(); update(); await captureCover();
+}));
+async function generateFilmstrip(token) {
+  const reader = document.createElement('video'); reader.muted = true; reader.playsInline = true;
+  reader.src = state.sourceUrl;
+  try {
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('Thumbnail load timed out')), 12000);
+      reader.onloadeddata = () => { clearTimeout(timeout); resolve(); };
+      reader.onerror = () => { clearTimeout(timeout); reject(new Error('Thumbnail load failed')); };
+      reader.load();
+    });
+    if (token !== state.sourceToken) return;
+    for (const url of thumbnailUrls) URL.revokeObjectURL(url);
+    thumbnailUrls.clear(); $('filmstrip').replaceChildren();
+    const duration = reader.duration, canvas = document.createElement('canvas'); canvas.width = 140; canvas.height = 88;
+    for (let i = 0; i < 8; i++) {
+      if (token !== state.sourceToken) return;
+      const time = Math.min(duration - .08, duration * (i + .15) / 8);
+      await seek(time, reader);
+      if (token !== state.sourceToken) return;
+      cropDraw(canvas.getContext('2d'), reader, 0, 0, 140, 88);
+      const url = URL.createObjectURL(await blobOf(canvas, 'image/jpeg', .7)); thumbnailUrls.add(url);
+      const button = document.createElement('button'); button.type = 'button'; button.setAttribute('aria-label', `选择 ${time.toFixed(1)} 秒附近的片段`);
+      const img = document.createElement('img'); img.src = url; img.alt = ''; button.append(img);
+      button.addEventListener('click', safely(async () => {
+        if (state.busy) return;
+        stopPlaying(); state.start = Math.min(Math.max(0, time - state.length / 2), Math.max(0, state.duration - state.length));
+        state.coverTime = time; state.customCover = null; invalidate(); update(); await captureCover();
+      }));
+      $('filmstrip').append(button);
+    }
+    text('timelineHint', '点击缩略帧定位，拖动滑条微调');
+  } finally { reader.removeAttribute('src'); reader.load(); }
+}
+
+document.querySelectorAll('[data-panel]').forEach(tab => tab.addEventListener('click', () => {
+  document.querySelectorAll('[data-panel]').forEach(item => {
+    const active = tab === item; item.classList.toggle('selected', active); item.setAttribute('aria-selected', String(active)); item.tabIndex = active ? 0 : -1;
+    $(item.dataset.panel).hidden = !active;
+  });
+}));
+document.querySelectorAll('[data-panel]').forEach((tab, index, tabs) => tab.addEventListener('keydown', e => {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  e.preventDefault();
+  const next = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (index + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  tabs[next].click(); tabs[next].focus();
+}));
+$('soundToggle').addEventListener('click', () => {
+  video.muted = !video.muted;
+  text('soundToggle', video.muted ? '静音预览' : '声音已开');
+  $('soundToggle').setAttribute('aria-label', video.muted ? '开启预览声音' : '关闭预览声音');
+});
+$('caption').addEventListener('input', () => { invalidate(); text('captionPreview', $('caption').value || '写一句，只属于这个瞬间的话'); });
+$('quickImport').addEventListener('click', () => $('file').click());
+$('studioNav').addEventListener('click', () => $('studio').scrollIntoView({behavior: 'smooth', block: 'start'}));
+$('sampleNav').addEventListener('click', () => $('sampleSection').scrollIntoView({behavior: 'smooth', block: 'start'}));
+const dialog = $('exportDialog');
+for (const id of ['openExport', 'openExportMobile', 'helpButton']) $(id).addEventListener('click', () => { stopPlaying(); dialog.showModal(); });
+$('closeExport').addEventListener('click', () => dialog.close());
+dialog.addEventListener('click', e => { if (e.target === dialog) { const box = dialog.getBoundingClientRect(); if (e.clientX < box.left || e.clientX > box.right || e.clientY < box.top || e.clientY > box.bottom) dialog.close(); } });
+const exportFormats = {
+  live: ['生成 Live Photo 包 ↓', 'Mac 解压后打开 livephoto.pvt，导入「照片」。iPhone 直接保存、壁纸和小红书原生实况上传仍待设备验证。'],
+  video: ['导出视频片段 ↓', '通用 MP4，可用于图文笔记、视频发布和聊天。它是普通短视频，不会被标成已经验证的原生实况图。'],
+  poster: ['生成 3:4 分享封面 ↓', '使用当前图片封面与「分享」设置中的文案，生成 1080 × 1440 JPG。'],
+  cover: ['导出图片封面 ↓', '导出你选择的视频帧或自选图片，使用当前作品的比例。'],
+};
+document.querySelectorAll('[data-kind]').forEach(button => button.addEventListener('click', () => {
+  state.exportKind = button.dataset.kind;
+  document.querySelectorAll('[data-kind]').forEach(item => { const active = item === button; item.classList.toggle('selected', active); item.setAttribute('aria-pressed', String(active)); });
+  text('exportNow', exportFormats[state.exportKind][0]); text('formatHelp', exportFormats[state.exportKind][1]);
+}));
+$('exportNow').addEventListener('click', safely(async () => {
+  if (!state.ready || state.busy) return;
+  if (state.exportKind === 'cover') await exportCover();
+  else if (state.exportKind === 'poster') await exportPoster();
+  else await runExport(state.exportKind);
+}));
 loadSamples().catch(() => status('可以直接放入自己的视频开始制作。'));

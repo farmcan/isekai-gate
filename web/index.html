@@ -1,59 +1,39 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>isekai-live · 把喜欢的几秒，留成实况</title>
-  <meta name="description" content="从视频里挑出喜欢的几秒，选一张封面，长按重温。视频选段、实况打包与分享封面，在浏览器完成。">
-  <link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css">
-  <script src="./vendor/ffmpeg.js" defer></script><script src="./vendor/fflate.js" defer></script>
-  <script type="module" src="./app.js"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>isekai-live · 留住，刚刚好的几秒</title>
+  <meta name="description" content="选一段视频，留住喜欢的几秒。可视时间轴、封面选帧、实况预览和按用途导出；文件在浏览器本地处理。">
+  <meta name="theme-color" content="#111319"><link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css">
+  <script src="./vendor/ffmpeg.js" defer></script><script src="./vendor/fflate.js" defer></script><script type="module" src="./app.js"></script>
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="./"><img src="./favicon.svg" width="32" height="32" alt="">isekai-live<span>实况创作室</span></a><nav><a href="#studio">开始制作 <span>↗</span></a><a href="#inspiration">找点灵感</a></nav></header>
+  <header class="topbar"><a class="brand" href="./"><img src="./favicon.svg" width="34" height="34" alt="">isekai-live</a><nav><button class="nav-item active" id="studioNav" type="button">创作台</button><button class="nav-item" id="sampleNav" type="button">试用示例</button></nav><div class="header-actions"><span class="privacy-badge"><span></span>素材留在本机</span><button id="openExport" class="button primary compact" disabled>导出作品 <span>↗</span></button></div></header>
   <main>
-    <section class="intro"><div><p class="eyebrow"><span class="dot"></span> STILL A PHOTO. UNTIL YOU HOLD IT.</p><h1>把喜欢的那几秒，<br>藏进一张<span class="highlight">照片。</span></h1><p class="intro-copy">猫猫突然回头、风吹起的瞬间、一个忍不住循环的梗。<br>不必留下一整段视频，只留你想再看一次的那几秒。</p></div><a class="intro-action" href="#studio">试试长按 <span>↓</span><small>让静止的画面动起来</small></a></section>
-    <section id="studio" class="studio" aria-label="实况制作工作台">
-      <div class="stage-column">
-        <div class="stage-top"><span>你的实况</span><span id="clipBadge">先选一个视频</span></div>
-        <button id="preview" class="preview" type="button" aria-label="按住预览实况，也可按空格键" disabled>
-          <video id="video" muted playsinline preload="metadata"></video><img id="cover" alt="实况封面" hidden>
-          <span class="live-badge"><span>◉</span> LIVE</span><span id="emptyPreview">喜欢的瞬间，<br>值得再看一次。<small>选一个下方示例，或放入自己的视频</small></span>
-          <span id="holdHint" class="hold-hint" hidden>◉ 按住，让它动起来</span>
-        </button>
-        <div class="stage-bottom"><span id="coverLabel">静态封面 → 长按播放</span><button id="playToggle" type="button" disabled>播放预览 ▷</button></div>
-        <div class="sample-heading"><h2>先玩一个</h2><span>已有梗图示例 · 非实时热榜</span></div><div id="samples" class="sample-grid" aria-label="示例素材"></div>
+    <section class="workspace-heading"><div><p class="eyebrow">A SMALL MOMENT. A LITTLE MORE LIFE.</p><h1>留住，刚刚好的几秒<span>。</span></h1><p class="heading-note">从一段视频开始，把想再看一次的瞬间，变成一张实况。</p><button id="quickImport" class="button secondary quick-import" type="button">＋ 选择我的视频</button></div><div class="flow" aria-label="制作流程"><span class="current">01 选素材</span><i></i><span>02 选瞬间</span><i></i><span>03 带走作品</span></div></section>
+    <section class="editor" id="studio" aria-label="实况创作台">
+      <div class="canvas-area">
+        <div class="canvas-toolbar"><div class="project-name"><span class="file-symbol">▤</span><span id="fileLabel">还没有选择视频</span><span class="file-tag" id="durationLabel">—</span></div><label class="replace-file">更换视频<input id="file" type="file" accept="video/mp4,video/quicktime,video/webm,video/*"></label></div>
+        <div class="preview-surface" id="dropzone">
+          <div class="canvas-guides" aria-hidden="true"><span>＋</span><span>＋</span><span>＋</span><span>＋</span></div>
+          <button id="preview" class="preview" type="button" aria-label="按住预览实况，也可按空格键" disabled><video id="video" muted playsinline preload="metadata"></video><img id="cover" alt="实况封面" hidden><span class="live-badge"><span>◉</span> LIVE</span><span id="emptyPreview"><span class="empty-glyph">▷</span><strong>从你喜欢的视频开始</strong><small>点击右侧选择视频，或把文件拖到这里</small></span><span id="holdHint" class="hold-hint" hidden><span>◉</span> 按住看实况 · 松开回到照片</span></button>
+          <div class="canvas-caption"><span id="coverLabel">一张封面，一段喜欢的动态。</span><span class="canvas-local">LOCAL STUDIO / 01</span></div>
+        </div>
+        <div class="transport"><button id="playToggle" class="play-button" disabled aria-label="播放预览">▷</button><span id="clipBadge">00:00.0 — 00:00.0</span><span class="transport-divider"></span><span class="transport-hint">空格 / 长按预览</span><button id="soundToggle" class="sound-button" aria-label="开启预览声音" disabled>静音预览</button></div>
+        <div class="timeline-panel"><div class="timeline-heading"><span><strong>选中你想留下的片段</strong><small id="timelineHint">点击缩略帧定位，拖动滑条微调</small></span><span class="timeline-key"><i></i>片段 <b></b>封面</span></div><div class="filmstrip-wrap" id="timelineTrack"><div id="filmstrip" class="filmstrip"><span class="empty-filmstrip">选择视频后，时间线会出现在这里</span></div><div class="selection-window" id="selectionWindow" hidden><span></span><span></span></div><div id="coverMarker" class="cover-marker" hidden><span>封面</span></div></div><div class="timeline-ruler"><span id="timelineStart">0:00</span><span id="timelineMiddle">0:00</span><span id="timelineEnd">0:00</span></div></div>
       </div>
-      <div class="controls">
-        <section class="step"><div class="step-heading"><span class="step-number">01</span><h2>放入一个视频</h2><span class="quiet-tag">本机处理</span></div>
-          <label class="dropzone" id="dropzone"><input id="file" type="file" accept="video/mp4,video/quicktime,video/webm,video/*"><span class="upload-icon">＋</span><strong id="fileLabel">选择视频，或拖到这里</strong><small>MP4 / MOV / WebM · 最多 120 MB、3 分钟</small></label>
-          <p class="field-note">从抖音或小红书保存好素材后，在这里选择文件。</p>
-        </section>
-        <section class="step"><div class="step-heading"><span class="step-number">02</span><h2>只留最喜欢的几秒</h2><output id="durationLabel">—</output></div>
-          <div class="preset-row" aria-label="片段时长"><button type="button" data-duration="1.5">1.5 秒</button><button class="selected" type="button" data-duration="3">3 秒</button><button type="button" data-duration="5">5 秒</button></div>
-          <label class="range-label" for="start">从这里开始 <output id="startLabel">0.0 s</output></label><input id="start" type="range" min="0" max="0" step="0.05" value="0" disabled>
-          <div class="timeline"><span id="timelineStart">0:00</span><span id="timelineEnd">0:00</span></div>
-          <div class="field-row"><label for="ratio">画面比例</label><select id="ratio"><option value="original">保留原比例</option><option value="3:4">3:4 · 图文</option><option value="9:16">9:16 · 竖屏</option><option value="1:1">1:1 · 方形</option></select></div>
-        </section>
-        <section class="step"><div class="step-heading"><span class="step-number">03</span><h2>选一张想停留的封面</h2></div>
-          <label class="range-label" for="coverTime">停在这一帧 <output id="coverTimeLabel">0.0 s</output></label><input id="coverTime" type="range" min="0" max="0" step="0.05" value="0" disabled>
-          <div class="cover-actions"><button id="capture" type="button" disabled>用这一帧作封面</button><label class="text-button">换成自己的图片<input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp" hidden></label></div>
-        </section>
-        <section class="export-section"><div class="export-heading"><strong>留住这一刻</strong><span id="exportSummary">选好素材就可以导出</span></div>
-          <button class="primary-button" id="exportLive" disabled>导出 Live Photo 包 <span>↗</span></button>
-          <div class="secondary-exports"><button id="exportVideo" disabled>视频片段 MP4 ↓</button><button id="exportCover" disabled>封面 JPG ↓</button></div>
-          <div id="progress" class="progress" hidden><progress id="progressBar" max="100" value="0"></progress><span id="progressText" role="status" aria-live="polite"></span><button id="cancelExport" type="button">取消</button></div>
-          <p id="status" class="status" role="status" aria-live="polite">视频与图片留在你的浏览器里。</p><div id="downloads" class="downloads"></div>
-          <details class="save-guide"><summary>导出之后，怎么保存和发布？</summary><p>Live Photo 包：下载 ZIP，解压后在 Mac 打开里面的 <b>livephoto.pvt</b>，导入「照片」。iPhone 直接保存、实况壁纸和小红书原生实况上传仍需设备验证。</p><p>发布笔记：可先用导出的视频片段和 JPG 封面；它们是普通视频 / 图片，不会被标成已验证的原生实况图。</p><p>建议用桌面版 Chrome 或 Edge 导出。首次导出需加载约 32 MB 转码工具；手机内存不足时可换电脑。原视频声音默认保留。</p></details>
-        </section>
-      </div>
+      <aside class="inspector" aria-label="作品设置"><div class="inspector-title"><h2>让它刚刚好</h2><span>调整作品</span></div><div class="inspector-tabs" role="tablist" aria-label="设置分类"><button type="button" role="tab" class="selected" aria-selected="true" aria-controls="panelClip" data-panel="panelClip">片段</button><button type="button" role="tab" aria-selected="false" aria-controls="panelCover" data-panel="panelCover">封面</button><button type="button" role="tab" aria-selected="false" aria-controls="panelShare" data-panel="panelShare">分享</button></div>
+        <section id="panelClip" class="inspector-panel" role="tabpanel"><label class="upload-card" for="file"><span class="upload-glyph">↑</span><strong>选择视频</strong><small>MP4 / MOV / WebM</small><span class="upload-limit">最多 120 MB · 3 分钟</span></label><div class="control-block"><div class="control-label"><label>保留几秒</label><span>SHORT & SWEET</span></div><div class="preset-row" aria-label="片段时长"><button type="button" data-duration="1.5">1.5 秒</button><button class="selected" type="button" data-duration="3">3 秒</button><button type="button" data-duration="5">5 秒</button></div><label class="range-label" for="start">片段从这里开始<output id="startLabel">0.0 s</output></label><input id="start" type="range" min="0" max="0" step="0.05" value="0" disabled><div class="time-summary"><span>结束于 <strong id="endLabel">0.0 s</strong></span><span>时长 <strong id="lengthLabel">—</strong></span></div></div><div class="control-block"><label class="field-label" for="ratio">画面比例</label><select id="ratio"><option value="original">原比例 · 保留完整画面</option><option value="3:4">3:4 · 图文笔记</option><option value="9:16">9:16 · 竖屏视频</option><option value="1:1">1:1 · 方形</option></select><p class="field-note">改变比例时，会从画面中央裁切。</p></div><div class="tip-card"><span>✦</span><p>先找一个完整的小动作。<br>回头、眨眼，或者一阵风。</p></div></section>
+        <section id="panelCover" class="inspector-panel" role="tabpanel" hidden><div class="panel-intro"><span class="panel-number">THE STILL MOMENT</span><h3>让照片停在最好的一帧。</h3><p>它是别人第一眼看到的样子。</p></div><label class="range-label" for="coverTime">封面位置<output id="coverTimeLabel">0.0 s</output></label><input id="coverTime" type="range" min="0" max="0" step="0.05" value="0" disabled><button id="capture" class="button secondary full-width" disabled>使用这一帧</button><div class="cover-divider"><span>或</span></div><label class="custom-cover"><span>＋</span><strong>使用另一张照片</strong><small>JPG / PNG / WebP · 15 MB 以内</small><input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp" hidden></label><p class="field-note">自选照片会使用相同比例。视频原片不变。</p></section>
+        <section id="panelShare" class="inspector-panel" role="tabpanel" hidden><div class="panel-intro"><span class="panel-number">TAKE IT SOMEWHERE</span><h3>给这个瞬间，一句话。</h3><p>导出 3:4 封面，配合视频发一篇笔记。</p></div><label class="field-label" for="caption">分享封面文案</label><textarea id="caption" rows="3" maxlength="36" placeholder="写一句，只有你会写的话">今天的快乐，只需要这几秒</textarea><div class="share-preview"><span>3:4</span><p id="captionPreview">今天的快乐，只需要这几秒</p><small>isekai-live</small></div><button id="copyPost" class="button secondary full-width" disabled>复制笔记文案 ↗</button><p class="field-note">这是发布素材准备。由你决定何时、在哪发布。</p></section>
+        <div class="inspector-bottom"><div><span>当前作品</span><strong id="exportSummary">等待选择素材</strong></div><p id="status" class="status" role="status" aria-live="polite">文件在浏览器本地处理，不上传。</p></div>
+      </aside>
     </section>
-    <section class="publish-panel" aria-labelledby="publishTitle"><div><p class="eyebrow">MAKE IT YOURS, THEN SHARE IT.</p><h2 id="publishTitle">不止存下来，也可以发出去。</h2><p>配一句你的话，做一张 3:4 封面。<br>把制作好的片段，带到下一篇笔记里。</p></div><div class="publish-controls"><label for="caption">封面上的一句话</label><input id="caption" maxlength="36" value="今天的快乐，只需要这几秒" placeholder="比如：长按，接收今日份快乐"><div class="publish-actions"><button id="exportPoster" disabled>下载 3:4 分享封面 ↓</button><button id="copyPost" disabled>复制笔记文案 ↗</button></div><small>发布前确认素材可使用；网站不会替你自动发帖。</small></div></section>
-    <section id="inspiration" class="inspiration"><div class="section-heading"><div><p class="eyebrow">A LITTLE INSPIRATION</p><h2>找的是那个瞬间。</h2></div><p>先看动作，再挑片段。<br>不用把整条视频都留下。</p></div><div class="idea-grid">
-      <article><span class="idea-number">01 / 萌宠反应</span><h3>回头的那一下，刚刚好。</h3><p>选眼神、歪头或突然定住的 1–3 秒。让封面停在动作之前，长按才有惊喜。</p><a href="https://www.douyin.com/video/7680498205821242659" target="_blank" rel="noopener noreferrer">抖音宠物实况案例 ↗</a></article>
-      <article><span class="idea-number">02 / 循环小梗</span><h3>脑子里已经开始循环了。</h3><p>选首尾接近、动作清楚的短片段。经典热梗适合试效果，不代表今天的流行榜单。</p><a href="https://knowyourmeme.com/memes/oo-ee-a-e-a-cat-remixes" target="_blank" rel="noopener noreferrer">OIIA 传播资料 ↗</a></article>
-      <article><span class="idea-number">03 / 生活碎片</span><h3>风、光、一个微小的动作。</h3><p>窗边光影、咖啡热气、朋友的笑场。优先用自己的视频，让作品真正和你有关。</p><a href="#studio">放入自己的片段 ↑</a></article>
-    </div></section>
+    <section class="sample-section" id="sampleSection"><div class="section-heading"><div><span class="eyebrow">START WITH A LITTLE INSPIRATION</span><h2>先试一个，再做你的。</h2></div><p>不需要准备素材，也能体验完整制作流程。</p></div><div id="samples" class="sample-grid" aria-label="示例素材"></div></section>
+    <section class="how-section"><div><span>01</span><h3>只选想留的片段</h3><p>从长视频里，找出你愿意再看一次的几秒。</p></div><div><span>02</span><h3>把封面也选好</h3><p>静止时是一张照片，按住后是那个瞬间。</p></div><div><span>03</span><h3>按你的用途带走</h3><p>实况包、短视频或分享封面，在导出时选择。</p></div></section>
   </main>
-  <footer><a class="brand" href="./">isekai-live</a><span>为你想再看一次的瞬间。</span><a href="./sources.html">素材来源与开源致谢 ↗</a></footer>
+  <footer><a class="brand" href="./">isekai-live</a><span>让喜欢的瞬间，多停留一下。</span><div><button id="helpButton" type="button">保存说明</button><a href="./sources.html">来源与致谢 ↗</a></div></footer>
+  <div class="mobile-export"><div><span>YOUR LITTLE MOMENT</span><strong id="mobileSummary">选择一个视频开始</strong></div><button id="openExportMobile" class="button primary" disabled>导出作品 ↗</button></div>
+  <dialog id="exportDialog" class="export-dialog"><div class="dialog-heading"><div><p class="eyebrow">READY TO TAKE IT WITH YOU?</p><h2>把这一刻带走。</h2></div><button id="closeExport" type="button" aria-label="关闭导出窗口">×</button></div><p class="dialog-intro">选择保存用途。你选好的片段和封面会一起带上。</p><div class="export-options" aria-label="导出用途"><button id="exportLive" class="export-option selected" type="button" aria-pressed="true" data-kind="live"><span class="format-icon">◉</span><span><strong>Mac Live Photo</strong><small>配对实况包 · ZIP</small></span><i></i></button><button id="exportVideo" class="export-option" type="button" aria-pressed="false" data-kind="video"><span class="format-icon">▷</span><span><strong>通用短视频</strong><small>发笔记、聊天 · MP4</small></span><i></i></button><button id="exportPoster" class="export-option" type="button" aria-pressed="false" data-kind="poster"><span class="format-icon">▧</span><span><strong>分享封面</strong><small>带一句话 · 3:4 JPG</small></span><i></i></button><button id="exportCover" class="export-option" type="button" aria-pressed="false" data-kind="cover"><span class="format-icon">▣</span><span><strong>纯图片封面</strong><small>你选好的那一帧 · JPG</small></span><i></i></button></div><div class="format-help" id="formatHelp">Mac 解压后打开 livephoto.pvt，导入「照片」。iPhone 直接保存、壁纸和小红书原生实况上传仍待设备验证。</div><div id="progress" class="progress" hidden><div><span id="progressText" role="status" aria-live="polite"></span><button id="cancelExport" type="button">取消</button></div><progress id="progressBar" max="100" value="0"></progress></div><button id="exportNow" class="button primary full-width">生成 Live Photo 包 <span>↓</span></button><p id="exportStatus" class="export-status" role="status" aria-live="polite"></p><div id="downloads" class="downloads"></div><details class="save-guide"><summary>保存与兼容性说明</summary><p>Mac 实况包包含 JPEG、MOV 及配对信息。资源已通过 Apple PHLivePhoto 接口读取；个人相册实际导入、iPhone 保存、动态壁纸与平台原生实况上传分别需要设备实测。</p><p>首次导出按需加载约 32 MB 转码工具。建议使用桌面 Chrome 或 Edge；手机内存不足时请换电脑。原素材不会被覆盖，原视频声音默认保留。</p></details></dialog>
 </body>
 </html>

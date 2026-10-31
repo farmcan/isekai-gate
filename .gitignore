@@ -22,3 +22,5 @@ htmlcov/
 
 # AI-generated plans & specs
 docs/superpowers/
+
+.wrangler/

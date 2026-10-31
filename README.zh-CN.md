@@ -46,13 +46,15 @@
 
 ## 网站版本（2026-10-31）
 
-网站入口：<https://farmcan.pages.dev/isekai-live/>，接入既有网站杂货铺并沿用整站登录保护。
+独立产品站：<https://isekai-live.pages.dev/>。网站杂货铺仅提供跳转入口；用户已明确要求独立站公开访问，汇总页继续保护。旧 `/isekai-live/` 子路径不再承载产品，保留受保护跳转。
 
-`web/` 是独立的浏览器本地制作工作台：视频选段（1.5/3/5 秒）、封面选帧或替换、比例裁切、长按/键盘预览、MP4/JPG、Mac Live Photo 包、3:4 分享封面和笔记文案。媒体不上传、无 AI API 消耗，不自动发帖。首次导出按需加载约 32 MB FFmpeg.wasm。
+`web/` 是浏览器本地实况剪辑台：可视缩略帧时间轴、片段拖动与时长微调、封面选帧或替换、比例裁切、长按/键盘预览，以及按用途选择 Mac 实况包、MP4、JPG 和 3:4 分享封面。手机布局提供首屏素材选择和固定导出入口。媒体不上传，不自动发帖或调用收费 AI。
 
-Live Photo 包包含写入相同标识的 JPEG 与 MOV，以及 `.pvt` 元数据。已用浏览器真实导出并通过 Apple `PHLivePhoto` 资源解码；这与实际导入个人相册、iPhone 保存、动态壁纸及小红书原生实况上传的设备验收分别记录，后者仍待实测。示例采用已有 MiaoTI 的 OIIA 与香蕉猫短片，是经典梗而非实时热榜；来源和使用边界在网页致谢及 `web/media/sources.json` 保留。
+公开示例来自 Wikimedia Commons 的 Dzkouslavia《Black Cat walking》，文件专属许可为 CC0 1.0；出处、加工和哈希保存在 `web/media/open-cat-source.json`。此前个人实验使用的经典猫梗不进入独立站发布包。
 
-源仓库使用 `python3 scripts/export_web.py --target <farmcan checkout>/site/isekai-live` 显式导出，主站只接收清单与哈希匹配的文件。转码组件固定版本和许可证见 `web/vendor/THIRD-PARTY.txt`；新增源码保持 MIT，FFmpeg core 单独按 GPL-2.0-or-later 分发。
+使用 `python3 scripts/build_web.py` 生成 `dist/standalone/`，再发布到 Cloudflare Pages 项目 `isekai-live`（生产分支 `dev`）。构建只复制显式审查清单，包含许可；不复制旧站、私人资料、凭据或原始诊断。用 `python3 scripts/verify_web.py` 核对真实生产资源。
+
+实况配对资源已通过 Apple PHLivePhoto 解码；个人相册实际导入、iPhone 直接保存、壁纸与小红书原生实况上传仍须分别设备验证。转码工具首次按需加载约 32 MB；依赖许可见 `web/vendor/THIRD-PARTY.txt`。
 
 ## 当前状态
 
