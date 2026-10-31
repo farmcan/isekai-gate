@@ -1,0 +1,30 @@
+isekai-live third-party components
+
+@ffmpeg/ffmpeg 0.12.15 — MIT
+Copyright (c) 2019 Jerome Wu
+License: ffmpeg-wasm-MIT.txt
+Corresponding wrapper source:
+https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v12.15/packages/ffmpeg
+
+@ffmpeg/core 0.12.10 (single-thread WebAssembly distribution) — GPL-2.0-or-later
+The unmodified npm WASM binary is split into two transport chunks and reassembled
+byte-for-byte before use. JavaScript loader is unmodified.
+Licenses: COPYING.GPLv2, COPYING.GPLv3
+Corresponding build scripts, FFmpeg source version and dependency revisions:
+https://github.com/ffmpegwasm/ffmpeg.wasm/tree/71aa99d37c02a7b4c435275ca9ef50e612f6efa1
+https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v12.15/build
+https://github.com/FFmpeg/FFmpeg/tree/n5.1.4
+FFmpeg includes third-party codecs such as x264; see the pinned build scripts for
+all component source revisions and license terms. No warranty. The component
+license governs this independently distributed executable engine.
+
+fflate 0.8.2 — MIT
+Copyright (c) 2023 Arjun Barrett
+License: fflate-MIT.txt
+Source: https://github.com/101arrowz/fflate/tree/v0.8.2
+
+Workflow research (no source code copied):
+flashlab/motion-live-photo at 48b884713c496ed4e4ad5ba688e84e6eb82ca059 (MIT)
+https://github.com/flashlab/motion-live-photo
+RhetTbull/makelive (MIT), Apple MakerNote tag 17 + QuickTime identifier format
+https://github.com/RhetTbull/makelive

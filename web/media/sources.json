@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-31",
+  "selection_note": "经典热梗示例，非抖音/小红书实时榜单；未把原站分类名当作梗身份。",
+  "items": [
+    {
+      "id": "oiia",
+      "title": "OIIA 旋转猫",
+      "hook": "表面很安静，长按开始转。",
+      "cover": "oiia.jpg",
+      "video": "oiia.mp4",
+      "duration_seconds": 3,
+      "width": 480,
+      "height": 480,
+      "category": "经典猫梗",
+      "heat_status": "historical_viral_not_current_ranking",
+      "historical_context": "2023 年 Bilibili 二创、2024 年末 TikTok 再传播；不是实时热榜。",
+      "reference_url": "https://knowyourmeme.com/memes/oo-ee-a-e-a-cat-remixes",
+      "primary_reference_url": "https://www.tiktok.com/@oicatofficial",
+      "primary_reference_check": "restricted_by_platform_not_directly_verified",
+      "media_source_url": "https://miaoti-dmv.pages.dev/v1/assets/cat-types/OIIA/oiia-animated.gif",
+      "source_gif_sha256": "92e2a02a1d233f7855762561ba3f26d3f750482dd4b0b57560f331ab12be906b",
+      "source_lineage": "Existing MiaoTI GIF, visually checked as a representative meme edit. Original GIF download URL and editor are not retained.",
+      "transform": "Silent H.264 preview, white canvas, aspect ratio preserved, cover extracted from exported MP4 frame zero. OIIA short GIF loop repeated to 3 seconds.",
+      "attribution": "Third-party meme; Ethel / OIIA community edits",
+      "rights_status": "commercial_license_unverified",
+      "usage_note": "用于现有受保护站点的个人实验演示；不是原创素材，不代表取得全网转载或商业授权。外发小红书前需换自有/已授权片段或逐素材确认发布范围。",
+      "files": {
+        "oiia.jpg": "3ea49df26f8bae95789e9ef3d4a54ca79900101fb28698196e52b789b0587ccc",
+        "oiia.mp4": "3894b08fbba79e38aa8c8f0ecf47719f2603fde6898f1cd37bad84aab517a9b7"
+      }
+    },
+    {
+      "id": "banana-cat",
+      "title": "Banana Cat 香蕉猫",
+      "hook": "一只会晃动的香蕉猫。",
+      "cover": "banana-cat.jpg",
+      "video": "banana-cat.mp4",
+      "duration_seconds": 3.6,
+      "width": 480,
+      "height": 480,
+      "category": "经典猫梗",
+      "heat_status": "historical_viral_not_current_ranking",
+      "historical_context": "2023 年 TikTok 猫咪短剧中的经典形象；不是实时热榜。",
+      "reference_url": "https://knowyourmeme.com/memes/sad-banana-cat",
+      "primary_reference_url": "https://www.tiktok.com/@happyhappiihappy/video/7211511707007487259",
+      "primary_reference_check": "restricted_by_platform_not_directly_verified",
+      "media_source_url": "https://miaoti-dmv.pages.dev/v1/assets/cat-types/CLING/cling-animated.gif",
+      "source_gif_sha256": "34e2bef157cd5e17e1aa7418244fd8a8379f14698e1467b744dd05c8901041f7",
+      "source_lineage": "Existing MiaoTI GIF, visually checked as a representative meme edit. Original GIF download URL and editor are not retained.",
+      "transform": "Silent H.264 preview, white canvas, aspect ratio preserved; cover extracted from exported MP4 frame zero; source animation retained for 3.6 seconds.",
+      "attribution": "Third-party Banana Cat community edit; exact GIF editor unknown",
+      "rights_status": "commercial_license_unverified",
+      "usage_note": "用于现有受保护站点的个人实验演示；不是原创素材，不代表取得全网转载或商业授权。外发小红书前需换自有/已授权片段或逐素材确认发布范围。",
+      "files": {
+        "banana-cat.jpg": "4eec917f44f5e630c8e4a53ab691aabdd47a0f3729ba5f3d90cf32d855f9dbb8",
+        "banana-cat.mp4": "2ac27edbf58f90c5f10b10261ef1afcc28a7eef6f165467834302c7e85b11b56"
+      }
+    }
+  ],
+  "reference_only": [
+    {
+      "title": "抖音宠物 AI 动态壁纸形式参考",
+      "url": "https://www.douyin.com/video/7680498205821242659",
+      "status": "search_index_reference_only",
+      "current_popularity": "unknown"
+    }
+  ]
+}

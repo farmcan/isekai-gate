@@ -44,6 +44,16 @@
 - `ai-video`：把已有视频做成风格化版本
 - `export-demo`：从封面图和视频导出演示 mp4 / gif
 
+## 网站版本（2026-10-31）
+
+网站入口：<https://farmcan.pages.dev/isekai-live/>，接入既有网站杂货铺并沿用整站登录保护。
+
+`web/` 是独立的浏览器本地制作工作台：视频选段（1.5/3/5 秒）、封面选帧或替换、比例裁切、长按/键盘预览、MP4/JPG、Mac Live Photo 包、3:4 分享封面和笔记文案。媒体不上传、无 AI API 消耗，不自动发帖。首次导出按需加载约 32 MB FFmpeg.wasm。
+
+Live Photo 包包含写入相同标识的 JPEG 与 MOV，以及 `.pvt` 元数据。已用浏览器真实导出并通过 Apple `PHLivePhoto` 资源解码；这与实际导入个人相册、iPhone 保存、动态壁纸及小红书原生实况上传的设备验收分别记录，后者仍待实测。示例采用已有 MiaoTI 的 OIIA 与香蕉猫短片，是经典梗而非实时热榜；来源和使用边界在网页致谢及 `web/media/sources.json` 保留。
+
+源仓库使用 `python3 scripts/export_web.py --target <farmcan checkout>/site/isekai-live` 显式导出，主站只接收清单与哈希匹配的文件。转码组件固定版本和许可证见 `web/vendor/THIRD-PARTY.txt`；新增源码保持 MIT，FFmpeg core 单独按 GPL-2.0-or-later 分发。
+
 ## 当前状态
 
 - `build`、`extract`、`remix`：已实现

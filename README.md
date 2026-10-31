@@ -44,6 +44,14 @@ The result is not just "a moving photo". It is a deliberately designed preview-t
 - `ai-video`: generate a stylized video from an existing clip
 - `export-demo`: export a demo MP4 and optional GIF from a cover image and video
 
+## Browser studio (2026-10-31)
+
+The first browser studio is hosted at <https://farmcan.pages.dev/isekai-live/> under the existing Farmcan sign-in gate. `web/` provides local video trimming, frame/custom covers, aspect-ratio crops, press-and-hold preview, MP4/JPG downloads, Mac Photos `.pvt` ZIP packages, and a 3:4 social cover plus editable post copy. Media stays in the browser; there is no automatic social posting or paid AI call.
+
+Browser-exported pairs have been decoded by Apple's `PHLivePhoto` API. Personal Photos-library import, iPhone save/wallpaper behavior, and native Xiaohongshu Live Photo upload remain separate device checks. Examples are historical cat memes, not a current popularity ranking; provenance and usage boundaries are retained in `web/media/sources.json`.
+
+Export only the reviewed bundle with `python3 scripts/export_web.py --target <farmcan checkout>/site/isekai-live`. The lazily loaded engine is about 32 MB. Third-party component versions and licenses are in `web/vendor/THIRD-PARTY.txt`; FFmpeg core is independently distributed under GPL-2.0-or-later.
+
 ## Status
 
 - `build`, `extract`, `remix`: implemented
