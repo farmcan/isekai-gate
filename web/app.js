@@ -27,13 +27,22 @@ function cropDraw(ctx, image, x, y, w, h) {
 }
 
 async function seek(time) {
-  if (Math.abs(video.currentTime - time) < .015 && video.readyState >= 2) return;
   await new Promise((resolve, reject) => {
     const cleanup = () => { clearTimeout(timer); video.removeEventListener('seeked', done); };
     const done = () => { cleanup(); resolve(); };
     const timer = setTimeout(() => { cleanup(); reject(new Error('视频定位超时，请换一个 MP4 片段')); }, 12000);
     video.addEventListener('seeked', done, {once: true});
-    video.currentTime = Math.min(time, Math.max(0, video.duration - .04));
+    const target = Math.min(time, Math.max(0, video.duration - .04));
+    video.currentTime = Math.abs(video.currentTime - target) < .001 ? Math.min(target + .01, video.duration - .02) : target;
+  });
+  // A loaded/seeked frame can precede the composited frame on WebKit. Waiting
+  // for presentation avoids black canvas covers on the initial paused frame.
+  await new Promise(resolve => {
+    let callback;
+    const done = () => { clearTimeout(timer); if (callback) video.cancelVideoFrameCallback(callback); resolve(); };
+    const timer = setTimeout(done, 180);
+    if (video.requestVideoFrameCallback) callback = video.requestVideoFrameCallback(done);
+    else requestAnimationFrame(() => requestAnimationFrame(done));
   });
 }
 
