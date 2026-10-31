@@ -91,3 +91,11 @@ web/media/meme-candidates.json 收录 7 个精确链接候选。5 条 YouTube �
 - [motion-live-photo](https://github.com/flashlab/motion-live-photo/tree/48b884713c496ed4e4ad5ba688e84e6eb82ca059) 是 MIT 本地媒体工具，可定点参考 Motion Photo helper。本站已有本地导出，不整站迁移 React；Android Motion Photo JPEG 和 Apple 配对 JPEG/MOV 各自验收。
 
 建议下一次真正付费生成前，先确定一个目标：若验证 AI 封面，就上传一张用户帧；若验证“异世界动态”，就只做一个有权使用的 3 秒片段、一个风格的真实视频编辑试验。把输入、模型、提示词、request_id、结果和成本留下，再决定是否接入网页或扩成多模板。当前无付费作业和外部生成成本发生。
+
+### 官方 Demo 的实际进入边界
+
+- [Viggle PINOC 花园](https://viggle.ai/pinoc/app/gallery#fireflyGarden)：公开现成作品可免登录交互；实际点击萤火虫，角色收集后进度从 0/8 到 1/8。图库有分享入口、作品直达与角色/动作/场景库。新生成触发 Google 登录，未生成新作品；不能把厂商现成样例当任意宠物输入效果。可借鉴结果本身可玩、可分享、能做同款，而非只放视频展示。
+- [LivePortrait 官方 Space](https://huggingface.co/spaces/KlingTeam/LivePortrait)：本轮用官方人像与动作样例尝试两次，输出均显示错误，具体原因未知。动物版属于独立说明，本轮未验证。对应 [Replicate 包装](https://replicate.com/fofr/live-portrait) 提醒 InsightFace 依赖的非商用限制，主项目 MIT 不自动覆盖完整推理链。
+- [MemeFast](https://memefast.app/)：官网的想法框本轮不可编辑，试用点击未返回成品，暂只核验其模板/照片/字幕的产品介绍，不视为完成生成。Product Hunt 小票数也不能包装为已验证爆款。
+
+最先值得验证的联动优先级：Miao Beat 现成演奏视频进入实况工具（文件衔接最少）→ MiaoTI 猫格进入具体剧情模板（内容连接更强，但要核实素材授权）→ 自有宠物生成真实短反应。三条入口分批验证，不把当前静态样张夸大为任何一条已接通的生成链。
