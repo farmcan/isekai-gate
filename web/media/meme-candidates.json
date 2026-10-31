@@ -1,0 +1,235 @@
+{
+  "researched_at": "2026-10-31",
+  "purpose": "供用户挑选的真实猫梗候选；研究名单不是授权素材库。",
+  "evidence_policy": "live_primary_ui = 本次在平台原帖页面读到；historical_secondary = 有日期的二级文献记载。播放/赞数仅说明累计传播，不等于现在仍在热榜。未下载任何候选媒体，未验证可二创或商业使用许可。",
+  "selection_recommendation": [
+    "oiia-apt",
+    "huh",
+    "bongo-bad-guy",
+    "surprised-kitty"
+  ],
+  "candidates": [
+    {
+      "id": "oiia-apt",
+      "title": "OIIA 旋转猫唱 APT",
+      "creator": "发帖时 @oicatofficial；本次页面重定向至 @oicatfanpage，属于混剪/粉丝页，非猫主人证明",
+      "platform": "TikTok",
+      "url": "https://www.tiktok.com/@oicatfanpage/video/7450906189321293088",
+      "published_at": "2024-12-23",
+      "what_happens": "灰猫 Ethel 的旋转剪影配 APT 节拍，适合短循环、节拍变化与异世界场景。Ethel 不等于黑白猫 Maxwell。",
+      "engagement": {
+        "likes": 1800000,
+        "views": 11000000,
+        "operator": ">",
+        "evidence_type": "historical_secondary",
+        "snapshot_period": "发布后一周，2024-12",
+        "source_url": "https://knowyourmeme.com/memes/oo-ee-a-e-a-cat-remixes",
+        "current_primary_likes": null
+      },
+      "verification": "精确 TikTok 链接已打开并显示视频标题及账号重定向，但正文/计数未向本次浏览器暴露；历史数据来自 KYM，不作当前计数。",
+      "heat": "2023 中文平台传播、2024-12 TikTok 回潮的经典梗；2026-10 当前热度未知。",
+      "visual_inspection": "未能播放原帖；没有给出假精确截取时间。",
+      "clip_window_seconds": null,
+      "ai_direction": "保留原动作节拍，比较原片与黏土/像素/太空舞台；所有 AI 成片需另行真实生成，不能把 CSS 滤镜称为 AI。",
+      "rights": "旋转剪影、原照片、歌曲各有权利层；未发现已授权的公开再分发许可。先链接原帖供选择，不提供下载。"
+    },
+    {
+      "id": "huh",
+      "title": "Huh 猫：一脸疑惑地啊？",
+      "creator": "此可核验帖子由 Robb Blob 上传；是转载/剪辑，不是猫主人原发",
+      "platform": "YouTube",
+      "url": "https://www.youtube.com/watch?v=s3BVvmXmd-g",
+      "published_at": "2023-11-02",
+      "what_happens": "白底花色胖猫带着疑惑表情发出 huh，适合打开/关闭、看到转化结果后的反应。",
+      "engagement": {
+        "likes": 78755,
+        "views_display": "317万次观看",
+        "evidence_type": "live_primary_ui",
+        "observed_at": "2026-10-31",
+        "source_url": "https://www.youtube.com/watch?v=s3BVvmXmd-g"
+      },
+      "heat": "2023 年走红的经典反应梗，不能据此称为 2026 当下热门。",
+      "visual_inspection": "原帖可播放并核对题名/作者/赞数；未完成逐帧选段。",
+      "clip_window_seconds": null,
+      "ai_direction": "保留那一声疑惑，原猫 → 宇航员/像素 NPC 的反差；适合一到两秒短促揭晓。",
+      "rights": "二传账号不代表许可。猫原发来源还需回溯，配音/编辑亦未取得二创许可。"
+    },
+    {
+      "id": "bongo-bad-guy",
+      "title": "Bongo Cat 乐队版 bad guy",
+      "creator": "Beebo (@Beebo)，创作者自己的 Bongo Cat cover 编辑",
+      "platform": "YouTube",
+      "url": "https://www.youtube.com/watch?v=VK8LH_KeG7A",
+      "published_at": "2019-07-07",
+      "what_happens": "三只线条小猫弹键盘、贝斯与敲击，简洁动作配强节拍，比泛用萌猫更有识别度。",
+      "engagement": {
+        "likes": 743019,
+        "views_display": "1151万次观看",
+        "evidence_type": "live_primary_ui",
+        "observed_at": "2026-10-31",
+        "source_url": "https://www.youtube.com/watch?v=VK8LH_KeG7A"
+      },
+      "heat": "历史高赞音乐梗；没有当前热榜证据。",
+      "visual_inspection": "浏览器已播放，查看 0 秒和约 22 秒画面，三只猫与乐器确认；没有完成一个连续四秒段的动作核验。",
+      "clip_window_seconds": null,
+      "ai_direction": "把扁平猫乐队转成毛毡/3D 小舞台，保持双爪动作和节拍，做原作与 AI 结果对照。",
+      "rights": "未核到 CC 授权。动画编辑与歌曲为不同权利层；选择后应联系创作者或用获授权素材，不直接搬下载。"
+    },
+    {
+      "id": "surprised-kitty",
+      "title": "Surprised Kitty：突然展开双爪",
+      "creator": "rozzzafly (@rozzzafly)，原帖标题标 Original",
+      "platform": "YouTube",
+      "url": "https://www.youtube.com/watch?v=0Bmhjf0rKe8",
+      "published_at": "2009-10-13",
+      "what_happens": "小猫仰躺被挠肚子，停下时双爪展开，是可懂的前后反差/惊讶反应。",
+      "engagement": {
+        "likes": 380292,
+        "views_display": "7983万次观看",
+        "evidence_type": "live_primary_ui",
+        "observed_at": "2026-10-31",
+        "source_url": "https://www.youtube.com/watch?v=0Bmhjf0rKe8"
+      },
+      "heat": "2009 经典网络视频；累计数据很强，但不是近期爆梗。",
+      "visual_inspection": "原帖已播放，查看约 2/6/14 秒画面；未完整捕捉一次展开双爪的起止，故不提供精确窗口。",
+      "clip_window_seconds": null,
+      "ai_direction": "可设计为触摸唤醒/转化成功时的惊讶反应；优先保持原情绪而非只做无意义慢摇。",
+      "rights": "原帖未验证可二创授权，无下载或再分发许可记录。"
+    },
+    {
+      "id": "keyboard-cat",
+      "title": "Keyboard Cat 原版",
+      "creator": "Keyboard Cat! (@keyboardcatreal)；Charlie Schmidt 的原版渠道",
+      "platform": "YouTube",
+      "url": "https://www.youtube.com/watch?v=J---aiyznGQ",
+      "published_at": "2007-06-07",
+      "what_happens": "穿蓝色衣服的橘猫弹电子琴，常用在尴尬/失败后的送走桥段。",
+      "engagement": {
+        "likes": 2991430,
+        "views_display": "9658万次观看",
+        "evidence_type": "live_primary_ui",
+        "observed_at": "2026-10-31",
+        "source_url": "https://www.youtube.com/watch?v=J---aiyznGQ"
+      },
+      "heat": "经典高赞原版，适合怀旧；不是近期热榜。",
+      "visual_inspection": "核到原帖作者、标题、赞数；播放遇到前贴片广告，未把广告当素材，也没有给出截取点。",
+      "clip_window_seconds": null,
+      "ai_direction": "原片 → 霓虹舞台/黏土演奏；也适合界面失败后出现的彩蛋。",
+      "rights": "说明中的 free OG art 是另一个链接/静态作品的表述，不能当成此视频免费二创授权；视频许可未验证。"
+    },
+    {
+      "id": "happy-happy-cat",
+      "title": "Happy Happy Happy 跳跳猫",
+      "creator": "原 X 发帖 @1Nssu；未核到是实际权利所有人",
+      "platform": "X / Twitter 原帖，后在 TikTok 广泛混剪",
+      "url": "https://twitter.com/1Nssu/status/663271961917652993",
+      "published_at": "2015-11-08",
+      "what_happens": "玻璃门后的小猫上下跳跃，常被配 My Happy Song；不是猫迎接主人回家的已证实故事。",
+      "engagement": {
+        "likes": 100000,
+        "reposts": 48600,
+        "operator": ">",
+        "evidence_type": "historical_secondary",
+        "snapshot_period": "原发后九年，KYM 2024-12 更新",
+        "source_url": "https://knowyourmeme.com/memes/happy-happy-happy-cat",
+        "current_primary_likes": null
+      },
+      "verification": "精确原帖已由 KYM 外链定位；本次 X 访问 403，未声称现场读到计数。",
+      "heat": "2015 原片、2023 猫 meme 常见反应；2026 当前热度未知。",
+      "visual_inspection": "未能播放原帖，窗口待核。",
+      "clip_window_seconds": null,
+      "ai_direction": "开心起跳是清晰动作；可以做毛绒跳跳猫 → 星空弹跳循环，适合 Live 图。",
+      "rights": "原视频与后配歌曲分别有权利；未验证二创许可。"
+    },
+    {
+      "id": "huh-universes",
+      "title": "Huh Cat：不同宇宙版本",
+      "creator": "músicos Cínicos 鯉 (@musicoscinicos)，已验证频道；是创作者混剪",
+      "platform": "YouTube",
+      "url": "https://www.youtube.com/watch?v=dmGARv2Bo0w",
+      "published_at": "2023-11-05",
+      "what_happens": "同一只 Huh 猫在不同 IP/配乐语境下切换；本次 0:03 可见 Digital Circus 红幕场景。",
+      "engagement": {
+        "likes": 52929,
+        "views_display": "838万次观看",
+        "evidence_type": "live_primary_ui",
+        "observed_at": "2026-10-31",
+        "source_url": "https://www.youtube.com/watch?v=dmGARv2Bo0w"
+      },
+      "heat": "历史音乐混剪，说明同动作换宇宙有成熟传播形式；不能据此宣称本站独创或 AI 已实现。",
+      "visual_inspection": "原帖已播放并查看 0:03 场景，未完成连续选段。",
+      "clip_window_seconds": null,
+      "ai_direction": "可借鉴它的产品表达：同一动作连续切换三种生成结果，并把每个结果清楚标成 AI 生成。",
+      "rights": "猫视频、歌曲、IP 画面和作者编辑多层权利；无已验证公开再分发许可，适合作形式参考。"
+    }
+  ],
+  "recent_chinese_ai_lead_not_ready_as_candidate": {
+    "title": "美味的我｜妙脆维修猫找搭子吃火锅的一天",
+    "creator": "咪的妙脆角",
+    "reported_published_at": "2026-08-22 05:58",
+    "what_happens": "妙脆角猫替火锅店修灯泡换半价、因吃播效果获免单；更贴近近期中文 AI 原生梗。",
+    "original_post_url": null,
+    "status": "已核新榜报道及其原帖截图；仍未定位精确抖音原帖 URL，当前现场赞数未知，保持待核线索。",
+    "evidence": [
+      {
+        "url": "https://www.newrank.cn/article/detail/34770?tag=Crocs",
+        "type": "secondary_report",
+        "published_period": "2026-09",
+        "reported": "单条超过163万赞、71.2万转发",
+        "published_at": "2026-09-29"
+      },
+      {
+        "url": "https://www.chanmama.com/open/awemeRank/lpyS0riLkpRNb4m0Vzv7FGRf0kJ7mM9O.html",
+        "type": "secondary_estimate_search_extract",
+        "reported": "162.2万赞、70.9万转发、2分16秒；页面明确标预估数据。直接打开返回410，不能当现场原帖计数。"
+      },
+      {
+        "url": "https://pic.newrank.cn/mmbiz_jpg/LyIxAyXGJQj2n93ibIFgpowlOFVHX6y3KVFNjYLeZ3GJeF6IL7NxJzBr81lPpmub4Bv3hgWQW3nPR1FxWcBEcYAtSuMGHYNBkGeOxxDQdGibI/640?from=appmsg&wx_fmt=jpeg",
+        "type": "historical_primary_ui_screenshot_in_secondary_article",
+        "article_published_at": "2026-09-29",
+        "inspected_at": "2026-10-31",
+        "observed": "新榜文章内双栏截图：左为咪的妙脆角账号、抖音号58936296；右为同名作者8月22日火锅视频，爱心163.0万、评论1.2万、收藏10.7万、转发71.2万；明确显示作者声明内容由AI生成。是报道发布时的截图，不能当2026-10-31现场计数。"
+      }
+    ],
+    "next_step": "如以后已有可用的正常抖音登录会话，可站内以精确题名及作者号58936296定位8月22日作品；得到原帖再核现场计数与授权。当前版本只展示报道来源，不能承诺可制作/下载该素材。",
+    "last_checked_at": "2026-10-31",
+    "current_primary_likes": null,
+    "creator_display_id_from_historical_screenshot": "58936296",
+    "verification_attempts": [
+      {
+        "at": "2026-10-31",
+        "surface": "Chrome 抖音站内精确题名搜索",
+        "url": "https://www.douyin.com/search/%E5%A6%99%E8%84%86%E7%BB%B4%E4%BF%AE%E7%8C%AB%E6%89%BE%E6%90%AD%E5%AD%90%E5%90%83%E7%81%AB%E9%94%85%E7%9A%84%E4%B8%80%E5%A4%A9",
+        "result": "显示登录后即可搜索更多精彩视频和扫码/验证码登录面板，未显示公开结果。没有现成登录会话，未绕过或要求用户短信。"
+      },
+      {
+        "at": "2026-10-31",
+        "surface": "蝉妈妈具体单条公开分析页",
+        "url": "https://www.chanmama.com/open/awemeRank/lpyS0riLkpRNb4m0Vzv7FGRf0kJ7mM9O.html",
+        "result": "浏览器现场显示410：该公开数据页已下架，登录查看详情；原帖外链不可得。搜索引擎缓存估算数字仍只作二级历史证据。"
+      },
+      {
+        "at": "2026-10-31",
+        "surface": "新榜原报道正文和视频截图",
+        "url": "https://www.newrank.cn/article/detail/34770?tag=Crocs",
+        "result": "核到精确发布日期2026-09-29和历史原帖截图，但正文/截图无精确作品URL。未将微博搬运或其他作者同名作品替代原帖。"
+      }
+    ],
+    "rights": "报道截图中的作者简介明确写原创形象版权已登记、禁止搬运；未取得下载、二创或公开再分发授权。仅可给用户看来源链接与题名进行选择。",
+    "clip_window_seconds": null
+  },
+  "excluded": [
+    {
+      "url": "https://www.douyin.com/video/7475980653599722809",
+      "reason": "猫菠萝的旋转猫可定位，但333.0万是账号总获赞，非本条；本条赞数未知。"
+    },
+    {
+      "url": "https://www.douyin.com/video/7462938398202891556",
+      "reason": "拿图口令服务搬运，搜索提取仅8866等无标签计数，既未核原作者也未达高赞筛选。"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=QH2-TGUlwu4",
+      "reason": "Nyan Cat 原版历史传播很大，但有私有/迁移迹象，本次未验证可用的原创渠道，不用旧累计数伪装现状。"
+    }
+  ]
+}

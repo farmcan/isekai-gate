@@ -36,3 +36,15 @@ MiaoTI 的 WOAH GIF 是大眼畸变灰猫，不能因为“震惊”就把它写
 新版使用独立的浅色产品外壳、深色预览画布和蓝色操作色；新增真实缩略帧时间轴、片段拖动、封面标记、声音预览、片段/封面/分享面板、用途式导出窗口和手机固定导出入口。媒体仍在浏览器本机处理，已验证的编码和元数据配对逻辑复用。
 
 公开示例为 Dzkouslavia 的 [Black Cat walking](https://commons.wikimedia.org/wiki/File:Black_Cat_walking.webm)，文件专属许可段落明确 CC0 1.0；截取原片 1–5 秒、缩放并去音轨，封面来自同一视频。详情见 `web/media/open-cat-source.json`。它是功能演示，不是热门证据；OIIA 与香蕉猫原记录保留，但不进入公开独立站包。
+
+## 用户反馈后的 AI 与彩色界面修订
+
+用户认为黑白编辑器普通、AI 未体现，并要求多个真实高赞梗自行挑选。核心问题成立：原版 app.js 只有剪辑，没有 AI 服务。新方向为“异世界照相馆”：淡紫、蜜桃与酸黄，照片式比较窗口，真实风格样张放在主舞台，剪辑收进制作台。
+
+参考 [DomoAI](https://help.domoai.app/en/articles/12958715-video-to-video) 的选风格流程与 [Krea](https://www.krea.ai/blog/how-to-generate-images-with-style-references-in-krea) 的可视参考。实际复用 img-comparison-slider 8.0.7（MIT，commit c73939d61c8fb010342c9910f1de420edbf0b067），保留完整许可；没有复制商业站品牌素材。React Bits 当前是 MIT + Commons Clause，不当作普通 MIT 组件库。
+
+通过内置 image_gen 将同一 CC0 黑猫帧生成动画与黏土两张静态封面，保存为 web/media/cat-ai-anime.png 与 cat-ai-clay.png。完整最终提示词、工具与来源保存在 web/media/ai-covers-source.json。用户切换风格后可直接把该真实 AI 封面与原视频配对导出。它是 AI 封面，不是完整视频转绘；未开放在线收费 AI 生成，也不把滤镜或过渡称为 AI。
+
+web/media/meme-candidates.json 收录 7 个精确链接候选。5 条 YouTube 帖子于 2026-10-31 从平台 UI 读取累计赞数，其余两条明确为有日期历史二级证据。猫梗选题单提供多选和复制，不下载或再分发未获授权的视频。近期“妙脆角维修猫”独立列为待核原帖线索：新榜 2026-09-29 截图记录 163 万赞，原作者注明禁止搬运，不能作为本站下载模板。
+
+仍待验证：用户真正选择哪种梗、自己的素材在线 AI 生成服务、整段 AI 视频效果，以及 iPhone/小红书原生实况保存。当前制作台只调用本地视频处理。

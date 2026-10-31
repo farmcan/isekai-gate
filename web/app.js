@@ -322,13 +322,13 @@ async function loadSamples() {
       const r = await fetch('./media/' + sample.video); if (!r.ok) throw new Error('示例暂时无法读取，请刷新后重试。');
       if (!(await loadSource(await r.blob(), sample.video, sample.id))) return;
       if (sample.start !== undefined) { state.start = sample.start; state.length = sample.length; state.coverTime = sample.coverTime ?? sample.start; update(); await captureCover(); }
-      $('studio').scrollIntoView({behavior: 'smooth', block: 'start'});
+      $('makerDetails').open = true; $('studio').scrollIntoView({behavior: 'smooth', block: 'start'});
     }));
     $('samples').append(button);
   }
   const own = document.createElement('button'); own.type = 'button'; own.className = 'sample sample-own';
   own.innerHTML = '<span class="sample-plus">＋</span><span><strong>接下来，试试你的。</strong><small>选一段相册里的视频</small></span>';
-  own.addEventListener('click', () => $('file').click()); $('samples').append(own);
+  own.addEventListener('click', () => { $('makerDetails').open = true; $('file').click(); }); $('samples').append(own);
   if (samples[0] && !state.source) {
     const sample = samples[0], r = await fetch('./media/' + sample.video);
     if (r.ok && !state.source) await loadSource(await r.blob(), sample.video, sample.id);
@@ -423,8 +423,8 @@ $('soundToggle').addEventListener('click', () => {
 });
 $('caption').addEventListener('input', () => { invalidate(); text('captionPreview', $('caption').value || '写一句，只属于这个瞬间的话'); });
 $('quickImport').addEventListener('click', () => $('file').click());
-$('studioNav').addEventListener('click', () => $('studio').scrollIntoView({behavior: 'smooth', block: 'start'}));
-$('sampleNav').addEventListener('click', () => $('sampleSection').scrollIntoView({behavior: 'smooth', block: 'start'}));
+$('studioNav').addEventListener('click', () => { $('makerDetails').open = true; $('studio').scrollIntoView({behavior: 'smooth', block: 'start'}); });
+
 const dialog = $('exportDialog');
 for (const id of ['openExport', 'openExportMobile', 'helpButton']) $(id).addEventListener('click', () => { stopPlaying(); dialog.showModal(); });
 $('closeExport').addEventListener('click', () => dialog.close());
@@ -447,3 +447,14 @@ $('exportNow').addEventListener('click', safely(async () => {
   else await runExport(state.exportKind);
 }));
 loadSamples().catch(() => status('可以直接放入自己的视频开始制作。'));
+
+window.isekaiStudio = {async useAiCover(url, name) {
+  if (state.busy) throw new Error('请先等待当前导出完成。');
+  const [source, cover] = await Promise.all([fetch('./media/open-cat.mp4'), fetch(url)]);
+  if (!source.ok || !cover.ok) throw new Error('样张加载失败，请重试。');
+  const [videoBlob, coverBlob] = await Promise.all([source.blob(), cover.blob()]);
+  await loadSource(videoBlob, '小黑猫 · ' + name);
+  state.customCover = coverBlob; state.coverTime = 0;
+  invalidate(); update(); await captureCover();
+  status('已使用 AI 静态封面；长按播放原视频，可导出实况配对包。');
+}};

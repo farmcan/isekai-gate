@@ -77,4 +77,4 @@ if args.base == 'https://isekai-live.pages.dev':
     assert not any('oiia' in name or 'banana-cat' in name for name in manifest['files'])
 print(json.dumps({'site': args.base, 'commit': manifest['source_commit'], 'access': manifest['access'],
                   'verified_asset_hashes': results.count('verified'), 'edge_protected': results.count('edge_protected'),
-                  'private_navigation_absent': True, 'sample_scope': 'explicit CC0 demonstration only'}, ensure_ascii=False))
+                  'private_navigation_absent': True, 'sample_scope': 'CC0 original + AI static covers; meme candidates link to source posts only'}, ensure_ascii=False))

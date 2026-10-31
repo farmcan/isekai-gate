@@ -1,0 +1,11 @@
+{
+  "tool": "built-in image_gen",
+  "source": "open-cat.jpg",
+  "created_at": "2026-10-31",
+  "source_record": "open-cat-source.json",
+  "scope": "AI-generated static covers paired with original video; not video-to-video generation",
+  "prompts": {
+    "anime": "Use case: style-transfer. Edit target: the attached CC0 video frame of a black cat walking toward camera on grass. Create a beautiful hand-painted Japanese animation film frame, lush mint and lime meadow, peach sunlit wall, violet shadows and expressive yellow cat eyes, confident soft ink outlines and cel shading. Preserve EXACT cat position, size, pose, camera angle, full 16:9 composition and all major scenery geometry so the result can be directly compared to original with a wipe slider. Remove graffiti lettering, simplify wall into a softly painted peach wall. Cat must remain black, with raised tail. No text, no UI, no border. Output one landscape image.",
+    "clay": "Use case: style-transfer. Edit target: attached CC0 video frame, a black cat walking toward the camera on grass. Transform the ENTIRE scene into a charming high-end handmade stop-motion clay miniature. Black soft sculpted clay cat with large amber eyes and raised tail, hand-shaped mint/lime clay grass and leaves, warm peach clay wall, subtle fingerprints, buttery daylight and lavender soft shadows. Preserve EXACT camera angle, cat location, size, pose and 16:9 composition, the original scene geometry must align for before/after wipe. Remove graffiti text from wall. Delightful tactile toy look, editorial quality. No typography, no UI, no borders. Output a single landscape image."
+  }
+}

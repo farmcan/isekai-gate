@@ -28,3 +28,8 @@ flashlab/motion-live-photo at 48b884713c496ed4e4ad5ba688e84e6eb82ca059 (MIT)
 https://github.com/flashlab/motion-live-photo
 RhetTbull/makelive (MIT), Apple MakerNote tag 17 + QuickTime identifier format
 https://github.com/RhetTbull/makelive
+
+img-comparison-slider 8.0.7, MIT, zero runtime dependencies.
+Source commit c73939d61c8fb010342c9910f1de420edbf0b067
+https://github.com/sneas/img-comparison-slider/tree/c73939d61c8fb010342c9910f1de420edbf0b067
+License: img-comparison-slider-MIT.txt
