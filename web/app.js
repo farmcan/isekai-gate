@@ -329,9 +329,9 @@ async function loadSamples() {
   const own = document.createElement('button'); own.type = 'button'; own.className = 'sample sample-own';
   own.innerHTML = '<span class="sample-plus">＋</span><span><strong>接下来，试试你的。</strong><small>选一段相册里的视频</small></span>';
   own.addEventListener('click', () => $('file').click()); $('samples').append(own);
-  if (samples[0]) {
+  if (samples[0] && !state.source) {
     const sample = samples[0], r = await fetch('./media/' + sample.video);
-    if (r.ok) await loadSource(await r.blob(), sample.video, sample.id);
+    if (r.ok && !state.source) await loadSource(await r.blob(), sample.video, sample.id);
   }
 }
 const thumbnailUrls = new Set();
