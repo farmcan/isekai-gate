@@ -1,7 +1,7 @@
 const $ = id => document.getElementById(id);
 const styles = {
-  anime: {name: '动画番剧', file: 'cat-ai-anime.png', line: '像误入了一帧夏日番剧。'},
-  clay: {name: '黏土小剧场', file: 'cat-ai-clay.png', line: '这只猫，好像可以捏一下。'},
+  anime: {name: '动画番剧', file: 'cat-ai-anime.jpg', line: '像误入了一帧夏日番剧。'},
+  clay: {name: '黏土小剧场', file: 'cat-ai-clay.jpg', line: '这只猫，好像可以捏一下。'},
 };
 let selected = 'anime';
 const select = id => {

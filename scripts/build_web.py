@@ -10,7 +10,7 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 FILES = {
     'index.html', 'style.css', 'portal.css', 'portal.js', 'app.js', 'live-pair.js', 'favicon.svg', 'sources.html',
-    'media/cat-ai-anime.png', 'media/cat-ai-clay.png', 'media/ai-covers-source.json', 'media/meme-candidates.json',
+    'media/cat-ai-anime.jpg', 'media/cat-ai-clay.jpg', 'media/ai-covers-source.json', 'media/meme-candidates.json',
     'vendor/img-comparison-slider.js', 'vendor/img-comparison-slider-MIT.txt',
     'media/public-sources.json', 'media/open-cat.mp4', 'media/open-cat.jpg',
     'media/open-cat-detail.jpg', 'media/open-cat-source.json',
